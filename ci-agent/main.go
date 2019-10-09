@@ -1,6 +1,11 @@
 package main
 
-import "ntci/ci-agent/web"
+import (
+	"os"
+	"strconv"
+
+	"ntci/ci-agent/web"
+)
 
 /***
 * ci-agents
@@ -9,6 +14,12 @@ import "ntci/ci-agent/web"
 *
  */
 func main() {
+	port := 8000
 
-	web.Run(8000)
+	p, err := strconv.Atoi(os.Getenv("CI_WEB_PORT"))
+	if err == nil {
+		port = p
+	}
+
+	web.Run(port)
 }
