@@ -64,7 +64,13 @@ func (s *Service) VerifyNtci(ntci git.Ntci) bool {
 		lanuage = strings.Split(ntci.Language, ":")[0]
 	}
 
-	if _, ok := bus.Language[lanuage]; !ok {
+	if _, ok := bus.LanguageRuntime[lanuage]; !ok {
+		return false
+	}
+
+	l := bus.LanguageRuntime[lanuage]
+
+	if _, ok := l[tag]; !ok {
 		return false
 	}
 
