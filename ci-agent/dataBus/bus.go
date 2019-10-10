@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/BurntSushi/toml"
+	"github.com/sirupsen/logrus"
 )
 
 var bus *dataBus
@@ -16,6 +17,13 @@ Other package can get configure from this object.
 
 [access.gitlab]
 	token="xxx" // The gitlab access token. Generate by user.
+
+[language]
+	# The language runtime image name
+	[language.go]
+	name="image name"
+	tag="latest/other tag"
+
 */
 type dataBus struct {
 	Access struct {
@@ -23,6 +31,12 @@ type dataBus struct {
 			Token string `toml:"token"`
 		} `toml:"gitlab"`
 	} `toml:"access"`
+	Language map[string]languageRuntime `toml:"language"`
+}
+
+type languageRuntime struct {
+	Name string `toml:"name"`
+	Tag  string `toml:"tag"`
 }
 
 /*
@@ -45,6 +59,7 @@ func InitDataBus(file string) (err error) {
 		return
 	}
 
+	logrus.Debugf("bus: %v", bus)
 	return
 }
 
