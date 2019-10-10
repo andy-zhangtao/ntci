@@ -3,9 +3,13 @@ package main
 import (
 	"os"
 	"strconv"
+	"strings"
 
+	"github.com/sirupsen/logrus"
 	"ntci/ci-agent/web"
 )
+
+var port = 8000
 
 /***
 * ci-agents
@@ -14,12 +18,23 @@ import (
 *
  */
 func main() {
-	port := 8000
+	web.Run(port)
+}
 
+func init() {
 	p, err := strconv.Atoi(os.Getenv("CI_WEB_PORT"))
 	if err == nil {
 		port = p
 	}
 
-	web.Run(port)
+	switch strings.ToLower(os.Getenv("CI_WEB_LOG_LEVEL")) {
+	case "info":
+		logrus.SetLevel(logrus.InfoLevel)
+	case "warn":
+		logrus.SetLevel(logrus.WarnLevel)
+	case "error":
+		logrus.SetLevel(logrus.ErrorLevel)
+	default:
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 }

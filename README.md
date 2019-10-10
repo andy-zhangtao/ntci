@@ -6,4 +6,6 @@ A New Tiny CI Tool
 + ci-agent
 > Listen the request from git repository, and parse it.
 
-CI Agent listen on 8000 as a default port. User change port use `CI_WEB_PORT` env variable.
+CI Agent listen on 8000 as a default port. User change port use `CI_WEB_PORT` env variable. 
+
+User use `CI_WEB_LOG_LEVEL` change log level, there are five levels: debug(default), info, warn and error.
