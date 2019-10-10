@@ -11,10 +11,12 @@ env:
 services:
   - docker
 
+before_install:
+  - echo "$DOCKER_PASSWD" | docker login -u "$DOCKER_USER" --password-stdin
+
 install:
   - go build -o bin/ntci ci-agent/main.go
 
 after_script:
-  - echo "$PASSWD" | docker login -u "$USER" --password-stdin
   - docker build -t vikings/ntci:$NTCI_VERSION-$TRAVIS_BRANCH -f Dockerfile.ntci
   - docker push vikings/ntci:$NTCI_VERSION-$TRAVIS_BRANCH
