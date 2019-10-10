@@ -40,7 +40,8 @@ func InitDataBus(file string) (err error) {
 		return
 	}
 
-	if _, err := toml.Decode(string(data), bus); err != nil {
+	_, err = toml.Decode(string(data), bus)
+	if err != nil {
 		return
 	}
 
