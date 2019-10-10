@@ -17,14 +17,16 @@ GitLabService handler gitlab request.
 
 url is gitlab repository url.
 id is this repository id.
+branch is trigger branch name.
 */
 type Service struct {
-	url string
-	id  int
+	url    string
+	id     int
+	branch string
 }
 
 func (s *Service) FetchNtCI() (n git.Ntci, err error) {
-	queryURL := fmt.Sprintf("%s/api/v4/projects/%d/repository/blobs/.ntci.yml/raw", s.url, s.id)
+	queryURL := fmt.Sprintf("%s/api/v4/projects/%d/repository/files/.ntci.yml/raw?ref=%s", s.url, s.id, s.branch)
 	logrus.Debugf("Fetch .ntci.yml request: %s", queryURL)
 
 	reqest, err := http.NewRequest("GET", queryURL, nil)
@@ -83,11 +85,14 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	gitService := new(Service)
 	gitService.url = push.Project.WebURL
 	gitService.id = push.ProjectID
+	gitService.branch = push.Ref
+
 	n, err := git.ParseProject(gitService)
 	if err != nil {
 		logrus.Errorf("Parse .ntci.yml Error. %s ", err.Error())
 		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	logrus.Debugf("ntct.yml: %v", n)
