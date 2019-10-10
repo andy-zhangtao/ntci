@@ -1,0 +1,20 @@
+language: go
+
+go:
+  - 1.13.1
+
+env:
+  global:
+  - GO111MODULE=on
+  - NTCI_VERSION=v0.1.0
+
+services:
+  - docker
+
+install:
+  - go build -o bin/ntci ci-agent/main.go
+
+after_script:
+  - echo "$PASSWD" | docker login -u "$USER" --password-stdin
+  - docker build -t vikings/ntci:$NTCI_VERSION-$TRAVIS_BRANCH
+  - docker push vikings/ntci:$NTCI_VERSION-$TRAVIS_BRANCH
