@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -26,7 +27,7 @@ type Service struct {
 }
 
 func (s *Service) FetchNtCI() (n git.Ntci, err error) {
-	queryURL := fmt.Sprintf("%s/api/v4/projects/%d/repository/files/.ntci.yml/raw?ref=%s", s.url, s.id, s.branch)
+	queryURL := fmt.Sprintf("%sapi/v4/projects/%d/repository/files/.ntci.yml/raw?ref=%s", s.url, s.id, s.branch)
 	logrus.Debugf("Fetch .ntci.yml request: %s", queryURL)
 
 	reqest, err := http.NewRequest("GET", queryURL, nil)
@@ -86,6 +87,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	gitService.url = push.Project.WebURL
 	gitService.id = push.ProjectID
 	gitService.branch = push.Ref
+	gitService.url = drawOffUrl(push)
 
 	n, err := git.ParseProject(gitService)
 	if err != nil {
@@ -96,4 +98,25 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logrus.Debugf("ntct.yml: %v", n)
+}
+
+/*
+drawOffUrl
+
+Get gitlab url from web url.  Since web url format is: http://[domain/ip][:port]/[namespace]/name.
+
+So use split web url, and return the first element.
+
+*/
+func drawOffUrl(p pushEvent) string {
+	end := ""
+	if p.Project.Namespace != "" {
+		end = fmt.Sprintf("%s/%s", p.Project.Namespace, p.Project.Name)
+	} else {
+		end = fmt.Sprintf("%s", p.Project.Name)
+	}
+
+	s := strings.Split(p.Project.WebURL, end)
+
+	return s[0]
 }
