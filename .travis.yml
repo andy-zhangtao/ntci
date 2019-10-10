@@ -16,5 +16,5 @@ install:
 
 after_script:
   - echo "$PASSWD" | docker login -u "$USER" --password-stdin
-  - docker build -t vikings/ntci:$NTCI_VERSION-$TRAVIS_BRANCH
+  - docker build -t vikings/ntci:$NTCI_VERSION-$TRAVIS_BRANCH -f Dockerfile.ntci
   - docker push vikings/ntci:$NTCI_VERSION-$TRAVIS_BRANCH
