@@ -25,6 +25,15 @@ Other package can get configure from this object.
 		"name:tag"
 		]
 
+# Choose build mode
+# User can use default agent.(single/k8s)
+# If user wants custom agent, it should implement the flowing apis:
+# 	- GET /_ping health check
+# 	- POST /trigger execute
+build-mode="single"
+[build]
+	[build.single]
+	addr=""
 */
 type dataBus struct {
 	Access struct {
@@ -39,6 +48,17 @@ type dataBus struct {
 	// Format:
 	// map[language name] = map[tag]name
 	LanguageRuntime map[string]map[string]string
+
+	// BuildMode
+	// This mode must exist in Build Sections
+	BuildMode string `toml:"build-mode"`
+	// Build
+	// Build Sections contains all valid build service
+	Build map[string]buildService `toml:"build"`
+}
+
+type buildService struct {
+	Addr string `toml:"addr"`
 }
 
 /*

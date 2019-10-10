@@ -10,4 +10,6 @@ type GitOperation interface {
 
 	// VerifyNtci Verify .ntci.yml valid or not.
 	VerifyNtci(ntci Ntci) bool
+
+	InvokeBuildService(ntci Ntci) error
 }
