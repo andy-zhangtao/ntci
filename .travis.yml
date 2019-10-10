@@ -19,5 +19,5 @@ install:
   - go build -o bin/ntci ci-agent/main.go
 
 after_script:
-  - docker build -t ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.ntci
+  - docker build -t ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.ntci .
   - docker push ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH}
