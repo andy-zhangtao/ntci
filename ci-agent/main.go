@@ -6,10 +6,12 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
+	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/web"
 )
 
 var port = 8000
+var busFile = "ntci.toml"
 
 /***
 * ci-agents
@@ -36,5 +38,15 @@ func init() {
 		logrus.SetLevel(logrus.ErrorLevel)
 	default:
 		logrus.SetLevel(logrus.DebugLevel)
+	}
+
+	if os.Getenv("CI_WEB_CONFIGURE") != "" {
+		busFile = os.Getenv("CI_WEB_CONFIGURE")
+	}
+
+	err = dataBus.InitDataBus(busFile)
+	if err != nil {
+		logrus.Errorf("Parse Configure Error: %s", err.Error())
+		os.Exit(-1)
 	}
 }
