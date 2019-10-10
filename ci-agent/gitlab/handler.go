@@ -55,6 +55,22 @@ func (s *Service) FetchNtCI() (n git.Ntci, err error) {
 	return
 }
 
+func (s *Service) VerifyNtci(ntci git.Ntci) bool {
+	bus := dataBus.GetBus()
+
+	lanuage := ntci.Language
+	tag := "latest"
+	if strings.Contains(ntci.Language, ":") {
+		lanuage = strings.Split(ntci.Language, ":")[0]
+	}
+
+	if _, ok := bus.Language[lanuage]; !ok {
+		return false
+	}
+
+	return true
+}
+
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {

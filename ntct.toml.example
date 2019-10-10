@@ -1,0 +1,9 @@
+# gitlab setting
+[access.gitlab]
+    token="123456"
+
+# build runtime setting
+[language]
+   go=[
+    "vikings/go:latest"
+   ]
