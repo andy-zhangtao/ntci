@@ -5,9 +5,10 @@ go:
 
 env:
   global:
-  - GO111MODULE=on
-  - NTCI_VERSION=v0.1.0
-  - NTCI_IMG_NAME=vikings/ntci
+    - GO111MODULE=on
+    - NTCI_VERSION=v0.1.0
+    - NTCI_IMG_NAME=vikings/ntci
+    - NTCI_IMG_K8S=vikings/k8s-build
 
 services:
   - docker
@@ -17,7 +18,10 @@ before_install:
 
 install:
   - go build -o bin/ntci ci-agent/main.go
+  - go build -o bin/k8s-build-server ci-build/k8s/*.go
 
 after_script:
   - docker build -t ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.ntci .
+  - docker build -t ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.k8s-build .
   - docker push ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH}
+  - docker push ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH}

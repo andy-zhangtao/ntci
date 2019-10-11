@@ -1,0 +1,3 @@
+FROM vikings/alpine
+COPY bin/k8s-build-server /k8s-build-server
+ENTRYPOINT ["/k8s-build-server"]
