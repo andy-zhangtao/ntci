@@ -18,6 +18,8 @@
 ```toml
 # 若为空, 默认使用80
 port=8000
+# Postgres Connstr
+postgres="postgres://ntci:123456@127.0.0.1:5432/ntci?sslmode=disable"
 
 [k8s]
     [k8s.c1]

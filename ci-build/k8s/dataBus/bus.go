@@ -13,7 +13,7 @@ type DataBus struct {
 	// Service Listen Port
 	Port int `toml:"port"`
 
-	K8S map[string]k8sConf `toml:"k8s"`
+	K8S k8sConf `toml:"k8s"`
 	// Support build language
 	Language map[string][]string `toml:"language"`
 	// LanguageRuntime
@@ -33,7 +33,7 @@ type k8sConf struct {
 	// K8s API Endpoint
 	Endpoint string `toml:"endpoint"`
 	// API Token. If use config file , this property can empty
-	Token string `toml:"token"`
+	//Token string `toml:"token"`
 	// Config file path, if use token, this property can empty
 	Config string `toml:"config"`
 }
@@ -91,8 +91,12 @@ func drawOffImg(lan map[string][]string) map[string]map[string]string {
 
 func isValid(bus *DataBus) error {
 
-	if len(bus.K8S) == 0 {
+	if bus.K8S.Endpoint == "" {
 		return errors.New("No Valid Kubernetes! ")
+	}
+
+	if bus.K8S.Config == ""{
+		return errors.New("No Valid Kubernetes config file! ")
 	}
 
 	if len(bus.LanguageRuntime) == 0 {
@@ -115,12 +119,10 @@ func debug(bus *DataBus) {
 	logrus.Debug("*************************************")
 	logrus.Debugf("Listen on: %d", bus.Port)
 
-	for name, k := range bus.K8S {
-		logrus.Debugf("Kubernetes: %s", name)
-		logrus.Debugf("  Endpoint: %s", k.Endpoint)
-		logrus.Debugf("  Token: %s", k.Token)
-		logrus.Debugf("  Config: %s", k.Config)
-	}
+	logrus.Debug("Kubernetes: ")
+	logrus.Debugf("  Endpoint: %s", bus.K8S.Endpoint)
+	//logrus.Debugf("  Token: %s", bus.K8S.Token)
+	logrus.Debugf("  Config: %s", bus.K8S.Config)
 
 	logrus.Debug("")
 
