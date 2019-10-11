@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -47,23 +46,23 @@ func (s *Service) FetchNtCI() (n git.Ntci, err error) {
 }
 
 func (s *Service) VerifyNtci(ntci git.Ntci) bool {
-	bus := dataBus.GetBus()
+	//bus := dataBus.GetBus()
+	//
+	//lanuage := ntci.Language
+	//tag := "latest"
+	//if strings.Contains(ntci.Language, ":") {
+	//	lanuage = strings.Split(ntci.Language, ":")[0]
+	//}
 
-	lanuage := ntci.Language
-	tag := "latest"
-	if strings.Contains(ntci.Language, ":") {
-		lanuage = strings.Split(ntci.Language, ":")[0]
-	}
-
-	if _, ok := bus.LanguageRuntime[lanuage]; !ok {
-		return false
-	}
-
-	l := bus.LanguageRuntime[lanuage]
-
-	if _, ok := l[tag]; !ok {
-		return false
-	}
+	//if _, ok := bus.LanguageRuntime[lanuage]; !ok {
+	//	return false
+	//}
+	//
+	//l := bus.LanguageRuntime[lanuage]
+	//
+	//if _, ok := l[tag]; !ok {
+	//	return false
+	//}
 
 	return true
 }
