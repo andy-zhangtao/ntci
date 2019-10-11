@@ -13,6 +13,7 @@
 
 * 创建参数文件
 ---
+
 `k8s-build-server`默认使用`k8s.toml`作为运行参数文件，格式如下：
 
 ```toml
@@ -36,7 +37,9 @@ port=8000
 ---
 
 ```shell script
+
 docker run -it --rm --name ntci -p 8000:8000 -v k8s.toml:/k8s.toml vikings/k8s-build:latest
+
 ```
 
 <h4 id="ntci">NTCI Server</h4>
@@ -59,7 +62,9 @@ build-mode="single"
 ---
 
 ```shell script
+
 docker run -it --rm --name ntci -p 80:80 -v ntci.toml:/ntci.toml vikings/ntci:latest
+
 ```
 
 
