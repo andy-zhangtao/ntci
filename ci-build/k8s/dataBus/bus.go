@@ -132,7 +132,7 @@ func debug(bus *DataBus) {
 	}
 
 	logrus.Debug("Postgres")
-	logrus.Debugf("  Endpoint: %s:%d", bus.Postgres)
+	logrus.Debugf("  Endpoint: %s", bus.Postgres)
 	logrus.Debug("")
 
 	logrus.Debug("*************************************")
