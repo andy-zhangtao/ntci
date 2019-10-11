@@ -1,15 +1,19 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 	"gopkg.in/yaml.v2"
 	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
+	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
 func (s *Service) FetchNtCI() (n git.Ntci, err error) {
@@ -64,5 +68,28 @@ func (s *Service) VerifyNtci(ntci git.Ntci) bool {
 }
 
 func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
+
+	bus := dataBus.GetBus()
+
+	conn, err := grpc.Dial(bus.Build[bus.BuildMode].Addr, grpc.WithInsecure())
+	if err != nil {
+		logrus.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	c := build_rpc_v1.NewBuildServiceClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	r, err := c.Run(ctx, &build_rpc_v1.Request{
+		Name: "",
+		Id:   "",
+	})
+
+	if err != nil {
+		logrus.Fatalf("could not greet: %v", err)
+	}
+	logrus.Printf("Greeting: %s", r.Message)
 	return
 }

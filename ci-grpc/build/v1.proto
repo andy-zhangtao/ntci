@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "build.rpc.v1";
+
+message Request {
+    string name = 1;
+    string id = 2;
+}
+
+message Reply {
+    int32 code = 1;
+    string message = 2;
+}
+service BuildService {
+    rpc Run (Request) returns (Reply) {
+    }
+}

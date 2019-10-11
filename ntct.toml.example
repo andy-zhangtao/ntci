@@ -7,3 +7,9 @@
    go=[
     "vikings/go:latest"
    ]
+
+# build mode
+build-mode="single"
+[build]
+	[build.single]
+	addr=""

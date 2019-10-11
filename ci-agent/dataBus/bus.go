@@ -82,7 +82,8 @@ func InitDataBus(file string) (err error) {
 	}
 
 	bus.LanguageRuntime = drawOffImg(bus.Language)
-	logrus.Debugf("bus: %v", bus)
+
+	debug()
 	return
 }
 
@@ -111,4 +112,26 @@ func drawOffImg(lan map[string][]string) map[string]map[string]string {
 	}
 
 	return runtime
+}
+
+func debug() {
+	logrus.Debug("DATA-BUS")
+	logrus.Debug("*************************************")
+	if bus.Access.Gitlab.Token != "" {
+		logrus.Debugf("GitLab Token: %s", bus.Access.Gitlab.Token)
+	}
+
+	for l, v := range bus.LanguageRuntime {
+		logrus.Debugf("Language: %s", l)
+		for tag, image := range v {
+			logrus.Debugf("  %s:%s", image, tag)
+		}
+	}
+
+	logrus.Debugf("Build Mode: %s", bus.BuildMode)
+	for m, svc := range bus.Build {
+		logrus.Debugf("  %s:[%s]", m, svc.Addr)
+	}
+
+	logrus.Debug("*************************************")
 }

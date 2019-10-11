@@ -52,13 +52,18 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gitService := new(Service)
-	gitService.url = push.Project.WebURL
-	gitService.id = push.ProjectID
-	gitService.branch = push.Ref
-	gitService.url = drawOffUrl(push)
+	//gitService := new(Service)
+	//gitService.url = push.Project.WebURL
+	//gitService.id = push.ProjectID
+	//gitService.branch = push.Ref
+	//gitService.url = drawOffUrl(push)
 
-	n, err := git.ParseAndExecuteBuild(gitService)
+	s.url = push.Project.WebURL
+	s.id = push.ProjectID
+	s.branch = push.Ref
+	s.url = drawOffUrl(push)
+
+	n, err := git.ParseAndExecuteBuild(s)
 	if err != nil {
 		logrus.Errorf("Parse .ntci.yml Error. %s ", err.Error())
 		w.Write([]byte(err.Error()))
