@@ -70,8 +70,8 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	n, err := git.ParseAndExecuteBuild(s)
 	if err != nil {
 		logrus.Errorf("Build Error. %s ", err.Error())
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
