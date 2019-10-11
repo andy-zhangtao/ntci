@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -92,6 +93,11 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 	if err != nil {
 		logrus.Errorf("Invoke Build Service Error.  %v", err)
 		return err
+	}
+
+	if r.Code != GRPC_SUCC {
+		logrus.Errorf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message)
+		return errors.New("Invoke Build Service Failed ")
 	}
 
 	logrus.Infof("Invoke Build Service Success: %d", r.Code)

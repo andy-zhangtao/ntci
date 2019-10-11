@@ -50,6 +50,8 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 	})
 
 	if err != nil {
+
+		logrus.Errorf("Add Build Record Error: %s", err.Error())
 		return &build_rpc_v1.Reply{
 			Code:    -1,
 			Message: err.Error(),

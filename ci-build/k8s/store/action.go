@@ -39,7 +39,6 @@ func (p *PGBus) getNextId(b Build) (id int, err error) {
 		rows.Scan(&id)
 		return id, p.addBuildId(b)
 	} else {
-
 		return 0, p.createNewId(b)
 	}
 }
