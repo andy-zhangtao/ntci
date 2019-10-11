@@ -34,7 +34,7 @@ port=8000
 
 * 快速启动
 
-```shell script
+```
 
 docker run -it --rm --name ntci -p 8000:8000 -v k8s.toml:/k8s.toml vikings/k8s-build:latest
 
@@ -58,7 +58,7 @@ build-mode="single"
 
 * 快速启动
 
-```shell script
+```
 
 docker run -it --rm --name ntci -p 80:80 -v ntci.toml:/ntci.toml vikings/ntci:latest
 
