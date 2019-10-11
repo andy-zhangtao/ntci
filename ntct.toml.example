@@ -1,3 +1,6 @@
+# build mode
+build-mode="single"
+
 # gitlab setting
 [access.gitlab]
     token="123456"
@@ -8,8 +11,6 @@
     "vikings/go:latest"
    ]
 
-# build mode
-build-mode="single"
 [build]
 	[build.single]
-	addr=""
+	addr="127.0.0.1:50000"
