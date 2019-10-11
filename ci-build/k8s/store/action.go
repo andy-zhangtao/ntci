@@ -37,22 +37,23 @@ func (p *PGBus) getNextId(b Build) (id int, err error) {
 
 	if rows.Next() {
 		rows.Scan(&id)
-		p.addBuildId(b)
-		return
+		return id, p.addBuildId(b)
 	} else {
-		p.createNewId(b)
-		return 0, nil
+
+		return 0, p.createNewId(b)
 	}
 }
 
-func (p *PGBus) createNewId(b Build) {
+func (p *PGBus) createNewId(b Build) error {
 	sql := "INSERT INTO id('name','id') VALUES($1,1)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
-	p.db.Exec(sql, b.Name)
+	_, err := p.db.Exec(sql, b.Name)
+	return err
 }
 
-func (p *PGBus) addBuildId(b Build) {
+func (p *PGBus) addBuildId(b Build) error {
 	sql := "UPDATE id set id=id+1 WHERE name=$1"
 	logrus.Debugf("UPDATE ID SQL: %s ", sql)
-	p.db.Exec(sql, b.Name)
+	_, err := p.db.Exec(sql, b.Name)
+	return err
 }
