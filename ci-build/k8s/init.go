@@ -6,6 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"ntci/ci-build/k8s/dataBus"
+	"ntci/ci-build/k8s/store"
 )
 
 var bus *dataBus.DataBus
@@ -30,4 +31,5 @@ func init() {
 
 	bus = b
 
+	store.PGInit(bus)
 }

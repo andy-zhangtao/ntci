@@ -20,6 +20,8 @@ type DataBus struct {
 	// Format:
 	// map[language name] = map[tag]name
 	LanguageRuntime map[string]map[string]string
+	// Postgres metadata
+	Postgres string `toml:"postgres"`
 }
 
 /*
@@ -101,6 +103,10 @@ func isValid(bus *DataBus) error {
 		bus.Port = 80
 	}
 
+	if bus.Postgres == "" {
+		return errors.New("No Valid Postgres Addr! ")
+	}
+
 	return nil
 }
 
@@ -124,6 +130,10 @@ func debug(bus *DataBus) {
 			logrus.Debugf("  %s:%s", image, tag)
 		}
 	}
+
+	logrus.Debug("Postgres")
+	logrus.Debugf("  Endpoint: %s", bus.Postgres)
+	logrus.Debug("")
 
 	logrus.Debug("*************************************")
 }

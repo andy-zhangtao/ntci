@@ -11,6 +11,10 @@ github.com/golang/protobuf/ptypes/timestamp
 github.com/gorilla/mux
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
+# github.com/lib/pq v1.2.0
+github.com/lib/pq
+github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
 # golang.org/x/net v0.0.0-20190311183353-d8887717615a

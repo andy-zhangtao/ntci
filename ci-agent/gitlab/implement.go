@@ -2,10 +2,10 @@ package gitlab
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -46,23 +46,23 @@ func (s *Service) FetchNtCI() (n git.Ntci, err error) {
 }
 
 func (s *Service) VerifyNtci(ntci git.Ntci) bool {
-	bus := dataBus.GetBus()
+	//bus := dataBus.GetBus()
+	//
+	//lanuage := ntci.Language
+	//tag := "latest"
+	//if strings.Contains(ntci.Language, ":") {
+	//	lanuage = strings.Split(ntci.Language, ":")[0]
+	//}
 
-	lanuage := ntci.Language
-	tag := "latest"
-	if strings.Contains(ntci.Language, ":") {
-		lanuage = strings.Split(ntci.Language, ":")[0]
-	}
-
-	if _, ok := bus.LanguageRuntime[lanuage]; !ok {
-		return false
-	}
-
-	l := bus.LanguageRuntime[lanuage]
-
-	if _, ok := l[tag]; !ok {
-		return false
-	}
+	//if _, ok := bus.LanguageRuntime[lanuage]; !ok {
+	//	return false
+	//}
+	//
+	//l := bus.LanguageRuntime[lanuage]
+	//
+	//if _, ok := l[tag]; !ok {
+	//	return false
+	//}
 
 	return true
 }
@@ -92,6 +92,11 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 	if err != nil {
 		logrus.Errorf("Invoke Build Service Error.  %v", err)
 		return err
+	}
+
+	if r.Code != GRPC_SUCC {
+		logrus.Errorf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message)
+		return errors.New("Invoke Build Service Failed ")
 	}
 
 	logrus.Infof("Invoke Build Service Success: %d", r.Code)

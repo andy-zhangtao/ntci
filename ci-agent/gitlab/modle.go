@@ -59,3 +59,7 @@ type pushEvent struct {
 		VisibilityLevel int    `json:"visibility_level"`
 	} `json:"repository"`
 }
+
+const (
+	GRPC_SUCC = 0
+)
