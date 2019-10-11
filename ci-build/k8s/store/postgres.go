@@ -2,7 +2,6 @@ package store
 
 import (
 	"database/sql"
-	"fmt"
 
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -27,17 +26,17 @@ func PG() *PGBus {
 
 func PGInit(bus *dataBus.DataBus) {
 	pb = new(PGBus)
-	connStr := ""
+	//connStr := ""
+	//
+	//if bus.Postgres.Passwd == "" {
+	//	connStr = fmt.Sprintf("postgres://%s@%s:%d/%s?sslmode=disable", bus.Postgres.User, bus.Postgres.Addr, bus.Postgres.Port, bus.Postgres.Name)
+	//} else {
+	//	connStr = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", bus.Postgres.User, bus.Postgres.Passwd, bus.Postgres.Addr, bus.Postgres.Port, bus.Postgres.Name)
+	//}
 
-	if bus.Postgres.Passwd == "" {
-		connStr = fmt.Sprintf("postgres://%s@%s:%d/%s?sslmode=disable", bus.Postgres.User, bus.Postgres.Addr, bus.Postgres.Port, bus.Postgres.Name)
-	} else {
-		connStr = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", bus.Postgres.User, bus.Postgres.Passwd, bus.Postgres.Addr, bus.Postgres.Port, bus.Postgres.Name)
-	}
+	logrus.Debugf("Postgres Connstr: %s", bus.Postgres)
 
-	logrus.Debugf("Postgres Connstr: %s", connStr)
-
-	db, err := sql.Open("postgres", connStr)
+	db, err := sql.Open("postgres", bus.Postgres)
 	if err != nil {
 		logrus.Fatalf("Connect Postgres Error: %s", err.Error())
 	}
