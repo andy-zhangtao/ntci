@@ -11,6 +11,8 @@ message Request {
     string url = 3;
     // commit id
     string id = 4;
+    // is query the latest build job. Only use in query actions.
+    bool latest = 5;
 }
 
 message Reply {
@@ -20,10 +22,30 @@ message Reply {
     // Empty when success, otherwise there will be error message
     string message = 2;
 }
+
+message JobDetail {
+    string name = 1;
+    int32 status = 2;
+    string timestamp = 3;
+    string branch = 4;
+    string url = 5;
+}
+
+message JobInfo {
+    int32 count = 1;
+    repeated JobDetail jd = 2;
+}
+
+
 service BuildService {
     rpc Run (Request) returns (Reply) {
     }
 
     rpc Ping (Request) returns (Reply) {
     }
+
+    rpc GetJob (Request) returns (JobInfo) {
+    }
+
+
 }

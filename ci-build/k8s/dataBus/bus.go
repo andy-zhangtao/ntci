@@ -20,6 +20,19 @@ type DataBus struct {
 	// Format:
 	// map[language name] = map[tag]name
 	LanguageRuntime map[string]map[string]string
+	// Postgres metadata
+	Postgres struct {
+		// database name. If empty will use postgres as default.
+		Name string `toml:"name"`
+		// if empty, then use 5432
+		Port int `toml:"port"`
+		// Cannot empty
+		User string `toml:"user"`
+		// Cannot empty
+		Passwd string `toml:"passwd"`
+		// The database url
+		Addr string `toml:"addr"`
+	} `toml:"postgres"`
 }
 
 /*
@@ -101,6 +114,22 @@ func isValid(bus *DataBus) error {
 		bus.Port = 80
 	}
 
+	if bus.Postgres.Addr == "" {
+		return errors.New("No Valid Postgres Addr! ")
+	}
+
+	if bus.Postgres.Port == 0 {
+		bus.Postgres.Port = 5432
+	}
+
+	if bus.Postgres.User == "" {
+		return errors.New("No Valid Postgres User! ")
+	}
+
+	if bus.Postgres.Name == "" {
+		bus.Postgres.Name = "postgres"
+	}
+
 	return nil
 }
 
@@ -125,5 +154,10 @@ func debug(bus *DataBus) {
 		}
 	}
 
+	logrus.Debug("Postgres")
+	logrus.Debugf("  Database: %s", bus.Postgres.Name)
+	logrus.Debugf("  Endpoint: %s:%d", bus.Postgres.Addr, bus.Port)
+	logrus.Debugf("  User: %s", bus.Postgres.User)
+	logrus.Debugf("  Passwd: %s", bus.Postgres.Passwd)
 	logrus.Debug("*************************************")
 }

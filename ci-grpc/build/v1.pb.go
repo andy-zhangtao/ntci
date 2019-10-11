@@ -32,7 +32,9 @@ type Request struct {
 	// repository url
 	Url string `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
 	// commit id
-	Id                   string   `protobuf:"bytes,4,opt,name=id,proto3" json:"id,omitempty"`
+	Id string `protobuf:"bytes,4,opt,name=id,proto3" json:"id,omitempty"`
+	// is query the latest build job. Only use in query actions.
+	Latest               bool     `protobuf:"varint,5,opt,name=latest,proto3" json:"latest,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -91,6 +93,13 @@ func (m *Request) GetId() string {
 	return ""
 }
 
+func (m *Request) GetLatest() bool {
+	if m != nil {
+		return m.Latest
+	}
+	return false
+}
+
 type Reply struct {
 	// 0 - success
 	// other - failed
@@ -141,28 +150,155 @@ func (m *Reply) GetMessage() string {
 	return ""
 }
 
+type JobDetail struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status               int32    `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
+	Timestamp            string   `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Branch               string   `protobuf:"bytes,4,opt,name=branch,proto3" json:"branch,omitempty"`
+	Url                  string   `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *JobDetail) Reset()         { *m = JobDetail{} }
+func (m *JobDetail) String() string { return proto.CompactTextString(m) }
+func (*JobDetail) ProtoMessage()    {}
+func (*JobDetail) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2e4aa7d76fd7ee8a, []int{2}
+}
+
+func (m *JobDetail) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_JobDetail.Unmarshal(m, b)
+}
+func (m *JobDetail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_JobDetail.Marshal(b, m, deterministic)
+}
+func (m *JobDetail) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JobDetail.Merge(m, src)
+}
+func (m *JobDetail) XXX_Size() int {
+	return xxx_messageInfo_JobDetail.Size(m)
+}
+func (m *JobDetail) XXX_DiscardUnknown() {
+	xxx_messageInfo_JobDetail.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JobDetail proto.InternalMessageInfo
+
+func (m *JobDetail) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *JobDetail) GetStatus() int32 {
+	if m != nil {
+		return m.Status
+	}
+	return 0
+}
+
+func (m *JobDetail) GetTimestamp() string {
+	if m != nil {
+		return m.Timestamp
+	}
+	return ""
+}
+
+func (m *JobDetail) GetBranch() string {
+	if m != nil {
+		return m.Branch
+	}
+	return ""
+}
+
+func (m *JobDetail) GetUrl() string {
+	if m != nil {
+		return m.Url
+	}
+	return ""
+}
+
+type JobInfo struct {
+	Count                int32        `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	Jd                   []*JobDetail `protobuf:"bytes,2,rep,name=jd,proto3" json:"jd,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
+}
+
+func (m *JobInfo) Reset()         { *m = JobInfo{} }
+func (m *JobInfo) String() string { return proto.CompactTextString(m) }
+func (*JobInfo) ProtoMessage()    {}
+func (*JobInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2e4aa7d76fd7ee8a, []int{3}
+}
+
+func (m *JobInfo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_JobInfo.Unmarshal(m, b)
+}
+func (m *JobInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_JobInfo.Marshal(b, m, deterministic)
+}
+func (m *JobInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JobInfo.Merge(m, src)
+}
+func (m *JobInfo) XXX_Size() int {
+	return xxx_messageInfo_JobInfo.Size(m)
+}
+func (m *JobInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_JobInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JobInfo proto.InternalMessageInfo
+
+func (m *JobInfo) GetCount() int32 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
+}
+
+func (m *JobInfo) GetJd() []*JobDetail {
+	if m != nil {
+		return m.Jd
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Request)(nil), "Request")
 	proto.RegisterType((*Reply)(nil), "Reply")
+	proto.RegisterType((*JobDetail)(nil), "JobDetail")
+	proto.RegisterType((*JobInfo)(nil), "JobInfo")
 }
 
 func init() { proto.RegisterFile("v1.proto", fileDescriptor_2e4aa7d76fd7ee8a) }
 
 var fileDescriptor_2e4aa7d76fd7ee8a = []byte{
-	// 199 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x8f, 0xbf, 0x4a, 0xc6, 0x30,
-	0x14, 0x47, 0xed, 0xff, 0x7a, 0x29, 0x45, 0xee, 0x20, 0xb1, 0x93, 0x74, 0x72, 0x0a, 0x54, 0xf1,
-	0x05, 0x0a, 0xee, 0x12, 0x07, 0xc1, 0xad, 0x4d, 0x2e, 0x35, 0xd0, 0xa6, 0x35, 0x6d, 0x0a, 0xbe,
-	0xbd, 0x34, 0xf6, 0xdb, 0xbe, 0xed, 0xfc, 0x4e, 0xe0, 0x90, 0x0b, 0xf9, 0xde, 0xf0, 0xc5, 0xce,
-	0xdb, 0x5c, 0x7f, 0x42, 0x26, 0xe8, 0xc7, 0xd1, 0xba, 0x21, 0x42, 0x6c, 0xba, 0x89, 0x58, 0xf0,
-	0x18, 0x3c, 0xdd, 0x0a, 0xcf, 0x78, 0x0f, 0x69, 0x6f, 0x3b, 0x23, 0xbf, 0x59, 0xe8, 0xed, 0xb9,
-	0xf0, 0x0e, 0x22, 0x67, 0x47, 0x16, 0x79, 0x79, 0x20, 0x96, 0x10, 0x6a, 0xc5, 0x62, 0x2f, 0x42,
-	0xad, 0xea, 0x57, 0x48, 0x04, 0x2d, 0xe3, 0xef, 0x91, 0x95, 0xb3, 0xfa, 0xcf, 0x26, 0xc2, 0x33,
-	0x32, 0xc8, 0x26, 0x5a, 0xd7, 0x6e, 0xa0, 0xb3, 0x7b, 0x99, 0xcf, 0x6f, 0x50, 0xb4, 0x4e, 0x8f,
-	0xea, 0x83, 0xec, 0xae, 0x25, 0xe1, 0x03, 0x44, 0xc2, 0x19, 0xcc, 0xf9, 0xf9, 0xcb, 0x2a, 0xe5,
-	0x3e, 0x5b, 0xdf, 0x60, 0x05, 0xf1, 0xbb, 0x36, 0xc3, 0xb5, 0xb7, 0xb6, 0xfc, 0x2a, 0xfa, 0x23,
-	0xc3, 0xed, 0x22, 0xf9, 0xde, 0xf4, 0xa9, 0xbf, 0xf6, 0xe5, 0x2f, 0x00, 0x00, 0xff, 0xff, 0x8c,
-	0xe5, 0x84, 0xc1, 0xf9, 0x00, 0x00, 0x00,
+	// 312 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x51, 0xcf, 0x4b, 0xf3, 0x40,
+	0x10, 0x6d, 0xf3, 0xab, 0xe9, 0x7c, 0xa5, 0x7c, 0x2c, 0x22, 0x6b, 0x11, 0x29, 0x39, 0xf5, 0xb4,
+	0xd0, 0x8a, 0x27, 0x6f, 0x45, 0x10, 0x7b, 0x92, 0xf5, 0xe6, 0x6d, 0x93, 0x8c, 0x75, 0x4b, 0x92,
+	0x8d, 0xd9, 0xdd, 0x82, 0x27, 0xff, 0x75, 0xc9, 0x76, 0xad, 0x3d, 0xd4, 0xdb, 0x7b, 0x6f, 0x18,
+	0xde, 0x7b, 0x33, 0x90, 0xee, 0x97, 0xac, 0xed, 0x94, 0x51, 0x99, 0x82, 0x11, 0xc7, 0x0f, 0x8b,
+	0xda, 0x10, 0x02, 0x51, 0x23, 0x6a, 0xa4, 0xc3, 0xf9, 0x70, 0x31, 0xe6, 0x0e, 0x93, 0x4b, 0x48,
+	0xf2, 0x4e, 0x34, 0xc5, 0x3b, 0x0d, 0x9c, 0xea, 0x19, 0xf9, 0x0f, 0xa1, 0xed, 0x2a, 0x1a, 0x3a,
+	0xb1, 0x87, 0x64, 0x0a, 0x81, 0x2c, 0x69, 0xe4, 0x84, 0x40, 0x96, 0xfd, 0x66, 0x25, 0x0c, 0x6a,
+	0x43, 0xe3, 0xf9, 0x70, 0x91, 0x72, 0xcf, 0xb2, 0x3b, 0x88, 0x39, 0xb6, 0xd5, 0x67, 0x6f, 0x57,
+	0xa8, 0xf2, 0x60, 0x17, 0x73, 0x87, 0x09, 0x85, 0x51, 0x8d, 0x5a, 0x8b, 0x2d, 0x7a, 0xbf, 0x1f,
+	0x9a, 0x7d, 0xc1, 0x78, 0xa3, 0xf2, 0x07, 0x34, 0x42, 0x56, 0x7f, 0x25, 0xd5, 0x46, 0x18, 0xab,
+	0xdd, 0x66, 0xcc, 0x3d, 0x23, 0xd7, 0x30, 0x36, 0xb2, 0x46, 0x6d, 0x44, 0xdd, 0xfa, 0xbc, 0xbf,
+	0xc2, 0x49, 0xbf, 0xe8, 0x5c, 0xbf, 0xf8, 0xd8, 0x2f, 0xbb, 0x87, 0xd1, 0x46, 0xe5, 0x4f, 0xcd,
+	0x9b, 0x22, 0x17, 0x10, 0x17, 0xca, 0x36, 0xc6, 0x47, 0x3f, 0x10, 0x32, 0x83, 0x60, 0x57, 0xd2,
+	0x60, 0x1e, 0x2e, 0xfe, 0xad, 0x80, 0x1d, 0xc3, 0xf2, 0x60, 0x57, 0xae, 0x10, 0x26, 0x6b, 0x2b,
+	0xab, 0xf2, 0x05, 0xbb, 0xbd, 0x2c, 0x90, 0x5c, 0x41, 0xc8, 0x6d, 0x43, 0x52, 0xe6, 0x6f, 0x3f,
+	0x4b, 0x98, 0x3b, 0x4a, 0x36, 0x20, 0x33, 0x88, 0x9e, 0x65, 0xb3, 0x3d, 0x3b, 0xbb, 0x81, 0xe4,
+	0x11, 0xcd, 0x46, 0xe5, 0x27, 0xd3, 0x94, 0xf9, 0x58, 0xd9, 0x60, 0x3d, 0x7d, 0x9d, 0xe4, 0xbd,
+	0x0d, 0xeb, 0xda, 0x82, 0xed, 0x97, 0x79, 0xe2, 0x7e, 0x7c, 0xfb, 0x1d, 0x00, 0x00, 0xff, 0xff,
+	0xb2, 0x6a, 0xf0, 0x02, 0xef, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -179,6 +315,7 @@ const _ = grpc.SupportPackageIsVersion4
 type BuildServiceClient interface {
 	Run(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
 	Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
+	GetJob(ctx context.Context, in *Request, opts ...grpc.CallOption) (*JobInfo, error)
 }
 
 type buildServiceClient struct {
@@ -207,10 +344,20 @@ func (c *buildServiceClient) Ping(ctx context.Context, in *Request, opts ...grpc
 	return out, nil
 }
 
+func (c *buildServiceClient) GetJob(ctx context.Context, in *Request, opts ...grpc.CallOption) (*JobInfo, error) {
+	out := new(JobInfo)
+	err := c.cc.Invoke(ctx, "/BuildService/GetJob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BuildServiceServer is the server API for BuildService service.
 type BuildServiceServer interface {
 	Run(context.Context, *Request) (*Reply, error)
 	Ping(context.Context, *Request) (*Reply, error)
+	GetJob(context.Context, *Request) (*JobInfo, error)
 }
 
 // UnimplementedBuildServiceServer can be embedded to have forward compatible implementations.
@@ -222,6 +369,9 @@ func (*UnimplementedBuildServiceServer) Run(ctx context.Context, req *Request) (
 }
 func (*UnimplementedBuildServiceServer) Ping(ctx context.Context, req *Request) (*Reply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (*UnimplementedBuildServiceServer) GetJob(ctx context.Context, req *Request) (*JobInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJob not implemented")
 }
 
 func RegisterBuildServiceServer(s *grpc.Server, srv BuildServiceServer) {
@@ -264,6 +414,24 @@ func _BuildService_Ping_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BuildService_GetJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).GetJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BuildService/GetJob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).GetJob(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _BuildService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "BuildService",
 	HandlerType: (*BuildServiceServer)(nil),
@@ -275,6 +443,10 @@ var _BuildService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _BuildService_Ping_Handler,
+		},
+		{
+			MethodName: "GetJob",
+			Handler:    _BuildService_GetJob_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
