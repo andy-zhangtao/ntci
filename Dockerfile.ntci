@@ -1,0 +1,4 @@
+FROM vikings/alpine
+COPY bin/ntci /ntci
+ENV CI_WEB_PORT=80
+ENTRYPOINT ["/ntci"]

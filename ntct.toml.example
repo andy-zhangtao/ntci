@@ -1,0 +1,16 @@
+# build mode
+build-mode="single"
+
+# gitlab setting
+[access.gitlab]
+    token="123456"
+
+# build runtime setting
+[language]
+   go=[
+    "vikings/go:latest"
+   ]
+
+[build]
+	[build.single]
+	addr="127.0.0.1:50000"
