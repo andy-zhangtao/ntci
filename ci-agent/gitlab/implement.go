@@ -90,7 +90,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 	})
 
 	if err != nil {
-		logrus.Fatalf("Invoke Build Service Error.  %v", err)
+		logrus.Errorf("Invoke Build Service Error.  %v", err)
 		return err
 	}
 
