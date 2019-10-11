@@ -83,13 +83,17 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 	defer cancel()
 
 	r, err := c.Run(ctx, &build_rpc_v1.Request{
-		Name: "",
-		Id:   "",
+		Name:   s.name,
+		Id:     s.commit,
+		Branch: s.branch,
+		Url:    s.url,
 	})
 
 	if err != nil {
-		logrus.Fatalf("could not greet: %v", err)
+		logrus.Fatalf("Invoke Build Service Error.  %v", err)
+		return err
 	}
-	logrus.Printf("Greeting: %s", r.Message)
+
+	logrus.Infof("Invoke Build Service Success: %d", r.Code)
 	return
 }

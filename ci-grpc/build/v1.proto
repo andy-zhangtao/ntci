@@ -3,15 +3,25 @@ syntax = "proto3";
 option go_package = "build.rpc.v1";
 
 message Request {
+    // project name
     string name = 1;
-    string id = 2;
+    // event branch
+    string branch = 2;
+    // repository url
+    string url = 3;
+    // commit id
+    string id = 4;
 }
 
 message Reply {
+    // 0 - success
+    // other - failed
     int32 code = 1;
+    // Empty when success, otherwise there will be error message
     string message = 2;
 }
 service BuildService {
     rpc Run (Request) returns (Reply) {
     }
+
 }

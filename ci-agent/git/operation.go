@@ -18,5 +18,7 @@ func ParseAndExecuteBuild(g GitOperation) (n Ntci, err error) {
 		return
 	}
 
+	err = g.InvokeBuildService(n)
+
 	return
 }

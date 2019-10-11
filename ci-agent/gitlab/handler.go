@@ -22,6 +22,8 @@ type Service struct {
 	url    string
 	id     int
 	branch string
+	name   string
+	commit string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -58,14 +60,16 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	//gitService.branch = push.Ref
 	//gitService.url = drawOffUrl(push)
 
-	s.url = push.Project.WebURL
+	//s.url = push.Project.WebURL
 	s.id = push.ProjectID
 	s.branch = push.Ref
+	s.name = push.Project.Name
+	s.commit = push.CheckoutSha
 	s.url = drawOffUrl(push)
 
 	n, err := git.ParseAndExecuteBuild(s)
 	if err != nil {
-		logrus.Errorf("Parse .ntci.yml Error. %s ", err.Error())
+		logrus.Errorf("Build Error. %s ", err.Error())
 		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
