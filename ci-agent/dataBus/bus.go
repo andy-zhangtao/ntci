@@ -2,7 +2,6 @@ package dataBus
 
 import (
 	"io/ioutil"
-	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/sirupsen/logrus"
@@ -16,6 +15,9 @@ DataBus
 The Global Configure Data
 Other package can get configure from this object.
 
+# Choose build mode
+build-mode="single"
+
 [access.gitlab]
 	token="xxx" // The gitlab access token. Generate by user.
 
@@ -25,12 +27,8 @@ Other package can get configure from this object.
 		"name:tag"
 		]
 
-# Choose build mode
 # User can use default agent.(single/k8s)
-# If user wants custom agent, it should implement the flowing apis:
-# 	- GET /_ping health check
-# 	- POST /trigger execute
-build-mode="single"
+# If user wants custom agent, it should implement ci-grpc/build/v1.proto
 [build]
 	[build.single]
 	addr=""
@@ -81,7 +79,7 @@ func InitDataBus(file string) (err error) {
 		return
 	}
 
-	bus.LanguageRuntime = drawOffImg(bus.Language)
+	//bus.LanguageRuntime = drawOffImg(bus.Language)
 
 	debug()
 	return
@@ -91,28 +89,28 @@ func GetBus() *dataBus {
 	return bus
 }
 
-// drawOffImg
-// Convert Language string to struct.
-func drawOffImg(lan map[string][]string) map[string]map[string]string {
-	runtime := make(map[string]map[string]string)
-
-	for key, value := range lan {
-		image := make(map[string]string)
-
-		for _, v := range value {
-			if strings.Contains(v, ":") {
-				_v := strings.Split(v, ":")
-				image[_v[0]] = _v[1]
-			} else {
-				image["latest"] = v
-			}
-		}
-
-		runtime[key] = image
-	}
-
-	return runtime
-}
+//// drawOffImg
+//// Convert Language string to struct.
+//func drawOffImg(lan map[string][]string) map[string]map[string]string {
+//	runtime := make(map[string]map[string]string)
+//
+//	for key, value := range lan {
+//		image := make(map[string]string)
+//
+//		for _, v := range value {
+//			if strings.Contains(v, ":") {
+//				_v := strings.Split(v, ":")
+//				image[_v[0]] = _v[1]
+//			} else {
+//				image["latest"] = v
+//			}
+//		}
+//
+//		runtime[key] = image
+//	}
+//
+//	return runtime
+//}
 
 func debug() {
 	logrus.Debug("DATA-BUS")
