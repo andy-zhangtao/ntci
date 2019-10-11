@@ -1,4 +1,4 @@
-# ntci
+# ntci [![Build Status](https://travis-ci.org/andy-zhangtao/ntci.svg?branch=master)](https://travis-ci.org/andy-zhangtao/ntci)
 A New Tiny CI Tool
 
 ## Agents
