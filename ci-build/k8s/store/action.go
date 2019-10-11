@@ -15,7 +15,7 @@ func (p *PGBus) AddNewBuild(b Build) (err error) {
 		return err
 	}
 
-	sql := "INSERT INTO build ('name','id','branch','git','timestamp') VALUES ($1, $2, $3, $4, $5)"
+	sql := "INSERT INTO build (name,id,branch,git,timestamp) VALUES ($1, $2, $3, $4, $5)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 
 	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp)
@@ -44,7 +44,7 @@ func (p *PGBus) getNextId(b Build) (id int, err error) {
 }
 
 func (p *PGBus) createNewId(b Build) error {
-	sql := "INSERT INTO id('name','id') VALUES($1,1)"
+	sql := "INSERT INTO id(name,id) VALUES($1,1)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 	_, err := p.db.Exec(sql, b.Name)
 	return err
