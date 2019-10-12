@@ -30,8 +30,6 @@ k8sConf
 Kubernetes metadata.
 */
 type k8sConf struct {
-	// K8s API Endpoint
-	Endpoint string `toml:"endpoint"`
 	// Namespace
 	Namespace string `toml:"namespace"`
 	// Config file path, if use token, this property can empty
@@ -95,6 +93,9 @@ func isValid(bus *DataBus) error {
 		return errors.New("No Valid Kubernetes config file! ")
 	}
 
+	if bus.K8S.Namespace == "" {
+		bus.K8S.Namespace = "default"
+	}
 	if len(bus.LanguageRuntime) == 0 {
 		return errors.New("No Valid Language! ")
 	}
@@ -116,7 +117,6 @@ func debug(bus *DataBus) {
 	logrus.Debugf("Listen on: %d", bus.Port)
 
 	logrus.Debug("Kubernetes: ")
-	logrus.Debugf("  Endpoint: %s", bus.K8S.Endpoint)
 	logrus.Debugf("  Namespace: %s", bus.K8S.Namespace)
 	logrus.Debugf("  Config: %s", bus.K8S.Config)
 
