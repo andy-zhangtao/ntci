@@ -19,6 +19,29 @@ type server struct {
 }
 
 /*
+fetch Image.
+
+If this build server don't contains specify language and version, then return false.
+
+Otherwise return true and fully image name.
+*/
+func fetchImage(language, version string) (bool, string) {
+
+	image := ""
+	if _, ok := bus.LanguageRuntime[language]; !ok {
+		return false, image
+	}
+
+	l := bus.LanguageRuntime[language]
+
+	if _, ok := l[version]; !ok {
+		return false, image
+	}
+
+	return true, fmt.Sprintf("%s:%s", l[version], version)
+}
+
+/*
 Ping
 
 Health Check
@@ -49,6 +72,17 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 		Git:       in.Url,
 		Timestamp: time.Now(),
 	}
+
+	isExist, image := fetchImage(in.Language, in.Lanversion)
+	if !isExist {
+		logrus.Errorf("Can not support this language: %s %s", in.Language, in.Lanversion)
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: fmt.Sprintf("Can not support this language: %s %s", in.Language, in.Lanversion),
+		}, nil
+	}
+
+	b.Image = image
 
 	id, err := s.pg.AddNewBuild(b)
 	if err != nil {

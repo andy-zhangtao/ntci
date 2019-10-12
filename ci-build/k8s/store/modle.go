@@ -8,4 +8,5 @@ type Build struct {
 	Id        int
 	Git       string
 	Timestamp time.Time
+	Image     string
 }

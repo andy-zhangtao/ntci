@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -46,23 +47,14 @@ func (s *Service) FetchNtCI() (n git.Ntci, err error) {
 }
 
 func (s *Service) VerifyNtci(ntci git.Ntci) bool {
-	//bus := dataBus.GetBus()
-	//
-	//lanuage := ntci.Language
-	//tag := "latest"
-	//if strings.Contains(ntci.Language, ":") {
-	//	lanuage = strings.Split(ntci.Language, ":")[0]
-	//}
 
-	//if _, ok := bus.LanguageRuntime[lanuage]; !ok {
-	//	return false
-	//}
-	//
-	//l := bus.LanguageRuntime[lanuage]
-	//
-	//if _, ok := l[tag]; !ok {
-	//	return false
-	//}
+	s.lanversion = "latest"
+	if strings.Contains(ntci.Language, ":") {
+		s.language = strings.Split(ntci.Language, ":")[0]
+		s.lanversion = strings.Split(ntci.Language, ":")[1]
+	} else {
+		s.language = ntci.Language
+	}
 
 	return true
 }
@@ -83,10 +75,12 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 	defer cancel()
 
 	r, err := c.Run(ctx, &build_rpc_v1.Request{
-		Name:   s.name,
-		Id:     s.commit,
-		Branch: s.branch,
-		Url:    s.url,
+		Name:       s.name,
+		Id:         s.commit,
+		Branch:     s.branch,
+		Url:        s.url,
+		Language:   s.language,
+		Lanversion: s.lanversion,
 	})
 
 	if err != nil {

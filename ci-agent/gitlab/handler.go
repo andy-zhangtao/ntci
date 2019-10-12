@@ -19,11 +19,13 @@ id is this repository id.
 branch is trigger branch name.
 */
 type Service struct {
-	url    string
-	id     int
-	branch string
-	name   string
-	commit string
+	url        string
+	id         int
+	branch     string
+	name       string
+	commit     string
+	language   string
+	lanversion string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {

@@ -11,8 +11,12 @@ message Request {
     string url = 3;
     // commit id
     string id = 4;
+    // build language
+    string language = 5;
+    // default is "latest"
+    string lanversion = 6;
     // is query the latest build job. Only use in query actions.
-    bool latest = 5;
+    bool latest = 7;
 }
 
 message Reply {
