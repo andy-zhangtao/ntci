@@ -71,6 +71,7 @@ func NewJob(b store.Build) (err error) {
 							Image: "nginx",
 						},
 					},
+					RestartPolicy: apiv1.RestartPolicyNever,
 				},
 			},
 		},
