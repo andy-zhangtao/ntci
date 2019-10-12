@@ -22,6 +22,8 @@ type DataBus struct {
 	LanguageRuntime map[string]map[string]string
 	// Postgres metadata
 	Postgres string `toml:"postgres"`
+	Token    string `toml:"token"`
+	Addr     string `toml:"addr"`
 }
 
 /*
@@ -130,9 +132,12 @@ func debug(bus *DataBus) {
 		}
 	}
 
+	logrus.Debug("")
 	logrus.Debug("Postgres")
 	logrus.Debugf("  Endpoint: %s", bus.Postgres)
 	logrus.Debug("")
 
+	logrus.Debugf("Token: %s", bus.Token)
+	logrus.Debugf("Addr: %s", bus.Addr)
 	logrus.Debug("*************************************")
 }

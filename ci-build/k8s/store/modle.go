@@ -9,4 +9,6 @@ type Build struct {
 	Git       string
 	Timestamp time.Time
 	Image     string
+	Token     string
+	Addr      string
 }

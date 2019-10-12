@@ -71,6 +71,8 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 		Branch:    in.Branch,
 		Git:       in.Url,
 		Timestamp: time.Now(),
+		Token:     bus.Token,
+		Addr:      bus.Addr,
 	}
 
 	isExist, image := fetchImage(in.Language, in.Lanversion)

@@ -68,7 +68,29 @@ func NewJob(b store.Build) (err error) {
 					Containers: []apiv1.Container{
 						{
 							Name:  b.Name,
-							Image: "nginx",
+							Image: b.Image,
+							Env: []apiv1.EnvVar{
+								{
+									Name:  "NTCI_BUILDER_JID",
+									Value: b.Name,
+								},
+								{
+									Name:  "NTCI_BUILDER_GIT",
+									Value: b.Git,
+								},
+								{
+									Name:  "NTCI_BUILDER_BRANCH",
+									Value: b.Branch,
+								},
+								{
+									Name:  "NTCI_BUILDER_TOKEN",
+									Value: b.Token,
+								},
+								{
+									Name:  "NTCI_BUILDER_ADDR",
+									Value: b.Addr,
+								},
+							},
 						},
 					},
 					RestartPolicy: apiv1.RestartPolicyNever,
