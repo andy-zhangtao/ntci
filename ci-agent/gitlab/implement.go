@@ -39,6 +39,8 @@ func (s *Service) FetchNtCI() (n git.Ntci, err error) {
 		return
 	}
 
+	logrus.Debugf(".ntci.yml content: %s", string(data))
+
 	err = yaml.Unmarshal(data, &n)
 	if err != nil {
 		return
