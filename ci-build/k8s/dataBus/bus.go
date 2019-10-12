@@ -91,10 +91,6 @@ func drawOffImg(lan map[string][]string) map[string]map[string]string {
 
 func isValid(bus *DataBus) error {
 
-	if bus.K8S.Endpoint == "" {
-		return errors.New("No Valid Kubernetes! ")
-	}
-
 	if bus.K8S.Config == "" {
 		return errors.New("No Valid Kubernetes config file! ")
 	}
