@@ -82,24 +82,7 @@ func NewJob(b store.Build) (err error) {
 		return err
 	}
 
-	logrus.Debugf("Job: %s", j.String())
-	//job := &batchv1.Job{
-	//	ObjectMeta: metav1.ObjectMeta{
-	//		Name:      "demo-job",
-	//		Namespace: "gitlab",
-	//	},
-	//	Spec: batchv1.JobSpec{
-	//		Template: apiv1.PodTemplateSpec{
-	//			Spec: apiv1.PodSpec{
-	//				Containers: []apiv1.Container{
-	//					{
-	//						Name:  "demo",
-	//						Image: "myimage",
-	//					},
-	//				},
-	//			},
-	//		},
-	//	},
-	//}
+	logrus.Debugf("Job Pod Num: %d", j.Status.Succeeded)
+
 	return nil
 }
