@@ -50,4 +50,6 @@ func run() (err error) {
 	if err := clone(); err != nil {
 		return errors.New(fmt.Sprintf("Clone Error: %s", err.Error()))
 	}
+
+	return
 }
