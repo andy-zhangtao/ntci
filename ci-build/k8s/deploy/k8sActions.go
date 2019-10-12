@@ -40,6 +40,10 @@ func InitK8sClient(bus *dataBus.DataBus) (err error) {
 	kc.namespace = bus.K8S.Namespace
 
 	info, err := kc.client.ServerVersion()
+	if err != nil {
+		return err
+	}
+
 	logrus.Infof("Kubernetes Version: %s", info.String())
 	return
 }

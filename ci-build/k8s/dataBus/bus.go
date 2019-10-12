@@ -75,7 +75,7 @@ func drawOffImg(lan map[string][]string) map[string]map[string]string {
 		for _, v := range value {
 			if strings.Contains(v, ":") {
 				_v := strings.Split(v, ":")
-				image[_v[0]] = _v[1]
+				image[_v[1]] = _v[0]
 			} else {
 				image["latest"] = v
 			}
@@ -96,6 +96,7 @@ func isValid(bus *DataBus) error {
 	if bus.K8S.Namespace == "" {
 		bus.K8S.Namespace = "default"
 	}
+
 	if len(bus.LanguageRuntime) == 0 {
 		return errors.New("No Valid Language! ")
 	}
