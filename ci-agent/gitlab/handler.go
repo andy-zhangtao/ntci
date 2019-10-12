@@ -37,7 +37,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Debugf("gitlab request data. %s ", string(data))
+	//logrus.Debugf("gitlab request data. %s ", string(data))
 
 	var push pushEvent
 
@@ -70,6 +70,8 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	s.url = drawOffUrl(push)
 
 	n, err := git.ParseAndExecuteBuild(s)
+	logrus.Debugf("ntct.yml: %v", n)
+
 	if err != nil {
 		logrus.Errorf("Build Error. %s ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -77,7 +79,6 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Debugf("ntct.yml: %v", n)
 }
 
 /*

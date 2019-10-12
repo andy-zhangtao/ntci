@@ -28,6 +28,7 @@ func (s *Service) FetchNtCI() (n git.Ntci, err error) {
 
 	reqest.Header.Add("PRIVATE-TOKEN", dataBus.GetBus().Access.Gitlab.Token)
 	logrus.Debugf("Fetch .ntci.yml Token: %s", dataBus.GetBus().Access.Gitlab.Token)
+
 	client := &http.Client{}
 
 	response, _ := client.Do(reqest)
