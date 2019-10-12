@@ -64,7 +64,7 @@ Run() will store build info into db.
 */
 func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.Reply, error) {
 
-	logrus.Debugf("Receive Build Request. Name: %s Branch: %s Git: %s ID: %s ", in.Name, in.Branch, in.Url, in.Id)
+	logrus.Debugf("Receive Build Request. Name: %s Branch: %s Git: %s ID: %s Language: %s Ver: %s ", in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion)
 
 	b := store.Build{
 		Name:      in.Name,
