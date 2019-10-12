@@ -121,12 +121,12 @@ func debug() {
 		logrus.Debugf("GitLab Token: %s", bus.Access.Gitlab.Token)
 	}
 
-	for l, v := range bus.LanguageRuntime {
-		logrus.Debugf("Language: %s", l)
-		for tag, image := range v {
-			logrus.Debugf("  %s:%s", image, tag)
-		}
-	}
+	//for l, v := range bus.LanguageRuntime {
+	//	logrus.Debugf("Language: %s", l)
+	//	for tag, image := range v {
+	//		logrus.Debugf("  %s:%s", image, tag)
+	//	}
+	//}
 
 	logrus.Debugf("Build Mode: %s", bus.BuildMode)
 	for m, svc := range bus.Build {
