@@ -36,6 +36,8 @@ func InitK8sClient(bus *dataBus.DataBus) (err error) {
 		return err
 	}
 
+	kc = new(k8sClient)
+
 	kc.client = clientset
 	kc.namespace = bus.K8S.Namespace
 
