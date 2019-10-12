@@ -32,8 +32,8 @@ Kubernetes metadata.
 type k8sConf struct {
 	// K8s API Endpoint
 	Endpoint string `toml:"endpoint"`
-	// API Token. If use config file , this property can empty
-	//Token string `toml:"token"`
+	// Namespace
+	Namespace string `toml:"namespace"`
 	// Config file path, if use token, this property can empty
 	Config string `toml:"config"`
 }
@@ -95,7 +95,7 @@ func isValid(bus *DataBus) error {
 		return errors.New("No Valid Kubernetes! ")
 	}
 
-	if bus.K8S.Config == ""{
+	if bus.K8S.Config == "" {
 		return errors.New("No Valid Kubernetes config file! ")
 	}
 
@@ -121,7 +121,7 @@ func debug(bus *DataBus) {
 
 	logrus.Debug("Kubernetes: ")
 	logrus.Debugf("  Endpoint: %s", bus.K8S.Endpoint)
-	//logrus.Debugf("  Token: %s", bus.K8S.Token)
+	logrus.Debugf("  Namespace: %s", bus.K8S.Namespace)
 	logrus.Debugf("  Config: %s", bus.K8S.Config)
 
 	logrus.Debug("")

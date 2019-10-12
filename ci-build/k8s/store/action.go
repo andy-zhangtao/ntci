@@ -9,17 +9,17 @@ AddNewBuild
 
 Insert new build record.
 */
-func (p *PGBus) AddNewBuild(b Build) (err error) {
-	id, err := p.getNextId(b)
+func (p *PGBus) AddNewBuild(b Build) (id int, err error) {
+	id, err = p.getNextId(b)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	sql := "INSERT INTO build (name,id,branch,git,timestamp) VALUES ($1, $2, $3, $4, $5)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 
 	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp)
-	return
+	return id, err
 }
 
 /*

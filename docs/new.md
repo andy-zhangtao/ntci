@@ -10,6 +10,7 @@
 
 
 <h4 id="build-config">Build Server(以k8s build Server为例)</h4>
+>`k8s-build-server`会尝试在K8s集群中指定Namespace中创建一个构建作业。
 
 * 创建参数文件
 
@@ -22,10 +23,11 @@ port=8000
 postgres="postgres://ntci:123456@127.0.0.1:5432/ntci?sslmode=disable"
 
 [k8s]
-    [k8s.c1]
-        endpoint="xx"
-        token="xxx"
-        config="xxx"
+    endpoint="xx"
+    # The build Job Namespace
+    namespace="xxx"
+    config="xxx"
+        
 
 [language]
     go=[

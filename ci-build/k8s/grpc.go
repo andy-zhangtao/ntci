@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"ntci/ci-build/k8s/deploy"
 	"ntci/ci-build/k8s/store"
 	build_rpc_v1 "ntci/ci-grpc/build"
 )
@@ -42,16 +43,27 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 
 	logrus.Debugf("Receive Build Request. Name: %s Branch: %s Git: %s ID: %s ", in.Name, in.Branch, in.Url, in.Id)
 
-	err := s.pg.AddNewBuild(store.Build{
+	b := store.Build{
 		Name:      in.Name,
 		Branch:    in.Branch,
 		Git:       in.Url,
 		Timestamp: time.Now(),
-	})
+	}
 
+	id, err := s.pg.AddNewBuild(b)
 	if err != nil {
-
 		logrus.Errorf("Add Build Record Error: %s", err.Error())
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: err.Error(),
+		}, nil
+	}
+
+	b.Id = id
+
+	err = deploy.NewJob(b)
+	if err != nil {
+		logrus.Errorf("Create Build Job Error: %s", err.Error())
 		return &build_rpc_v1.Reply{
 			Code:    -1,
 			Message: err.Error(),
