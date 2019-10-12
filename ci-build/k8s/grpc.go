@@ -122,6 +122,18 @@ func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.Request) (*build_r
 	return ji, nil
 }
 
+/*
+JobStatus
+
+Update job status.
+*/
+func (s *server) JobStatus(ctx context.Context, in *build_rpc_v1.Builder) (*build_rpc_v1.Reply, error) {
+	return &build_rpc_v1.Reply{
+		Code:    0,
+		Message: "OK",
+	}, nil
+}
+
 func start(port int) {
 
 	p := fmt.Sprintf(":%d", port)
