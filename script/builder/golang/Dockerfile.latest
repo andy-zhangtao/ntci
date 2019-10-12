@@ -1,0 +1,6 @@
+FROM golang:latest
+RUN  apt-get update && \
+     apt-get install -y git
+COPY bin/builder /builder
+ENV  NTCI_BUILDER_ROOT=/go/src
+ENTRYPOINT ["/builder"]

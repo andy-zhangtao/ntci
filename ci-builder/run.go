@@ -3,6 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"os/exec"
+	"text/template"
 )
 
 /*
@@ -34,8 +37,30 @@ type ntci struct {
 //clone
 //This function clone git project into local. And try to
 //parse .ntci.yaml.
-func clone() (err error) {
-	return nil
+//
+//root 	Build Root Path
+//url 	Repository URL
+//branch Remote Branch
+//
+//Execute two command:
+// git clone jid url
+// git checkout -b branch origin/branch
+func git() (err error) {
+	t := template.Must(template.New("git").Parse(cloneTpl))
+
+	f, err := os.Create("/build.sh")
+	if err != nil {
+		return err
+	}
+
+	err = t.Execute(f, gm)
+	if err != nil {
+		return err
+	}
+
+	f.Close()
+
+	return exec.Command("sh", "/build.sh").Run()
 }
 
 //parse
@@ -47,8 +72,8 @@ func parse(file string) (nt ntci, err error) {
 }
 
 func run() (err error) {
-	if err := clone(); err != nil {
-		return errors.New(fmt.Sprintf("Clone Error: %s", err.Error()))
+	if err := git(); err != nil {
+		return errors.New(fmt.Sprintf("Execute Git Script Error: %s", err.Error()))
 	}
 
 	return

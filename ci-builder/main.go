@@ -1,5 +1,7 @@
 package main
 
+import "github.com/sirupsen/logrus"
+
 //This is code builder. This builder will execute in other build container, like go, java, nodejs etc.
 //
 //Builder will try to clone repository from git, and parse .ntci.yml in root path. Then execute all command by order.
@@ -14,5 +16,9 @@ package main
 // NTCI_BUILDER_BRANCH 	git branch
 // NTCI_BUILDER_ADDR	build server addr
 func main() {
+	if err := run(); err != nil {
+		logrus.Fatalf(err.Error())
+	}
 
+	logrus.Debugf("Build Finish")
 }

@@ -19,9 +19,12 @@ before_install:
 install:
   - go build -o bin/ntci ci-agent/main.go
   - go build -o bin/k8s-build-server ci-build/k8s/*.go
+  - go build -o bin/ntci-builder ci-builder/*.go
 
 after_script:
   - docker build -t ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.ntci .
   - docker build -t ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.k8s-build .
+  - docker build -t ${NTCI_IMG_NAME}-go:latest -f script/builder/golang/Dockerfile.latest .
   - docker push ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH}
   - docker push ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH}
+  - docker push ${NTCI_IMG_NAME}-go:latest
