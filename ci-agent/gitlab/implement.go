@@ -81,7 +81,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		Name:       s.name,
 		Id:         s.commit,
 		Branch:     s.branch,
-		Url:        s.url,
+		Url:        s.webURL,
 		Language:   s.language,
 		Lanversion: s.lanversion,
 	})

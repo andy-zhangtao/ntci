@@ -3,9 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"text/template"
+
+	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 /*
@@ -68,6 +72,21 @@ func git() (err error) {
 //.ntci.yaml.
 //If parse success, then return a filling object. Otherwise return a error
 func parse(file string) (nt ntci, err error) {
+	if _, err = os.Stat(file); os.IsNotExist(err) {
+		err = errors.New(file + " not exist.")
+		return
+	}
+
+	data, err := ioutil.ReadFile(file)
+	if err != nil {
+		return
+	}
+
+	err = yaml.Unmarshal(data, &nt)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
@@ -76,5 +95,19 @@ func run() (err error) {
 		return errors.New(fmt.Sprintf("Execute Git Script Error: %s", err.Error()))
 	}
 
+	ntciConfig := fmt.Sprintf("%s/%s/.ntci.yml", gm.Root, gm.Name)
+
+	nt, err := parse(ntciConfig)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Parse .ntci.yml Error: %s", err.Error()))
+	}
+
+	logrus.Debug(".ntci.yml")
+	logrus.Debugf("  language: %s", nt.Language)
+	logrus.Debugf("  env: %s", nt.Env)
+	logrus.Debugf("  build: %s", nt.Build)
+	logrus.Debugf("  before build: %s", nt.BeforeBuild)
+	logrus.Debugf("  after build: %s", nt.AfterBuild)
+	logrus.Debug(" ")
 	return
 }

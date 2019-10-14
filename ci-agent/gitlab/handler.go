@@ -20,6 +20,7 @@ branch is trigger branch name.
 */
 type Service struct {
 	url        string
+	webURL     string
 	id         int
 	branch     string
 	name       string
@@ -67,6 +68,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	s.branch = push.Ref
 	s.name = push.Project.Name
 	s.commit = push.CheckoutSha
+	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
 
 	n, err := git.ParseAndExecuteBuild(s)
