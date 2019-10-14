@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 	"text/template"
 
 	"github.com/sirupsen/logrus"
@@ -109,7 +110,19 @@ func build(nt ntci) (err error) {
 
 	f.Close()
 
-	return exec.Command("sh", "/build.sh").Run()
+	cmd := exec.Command("sh", "/build.sh")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+	logrus.Info("===========Build Log===========")
+	logrus.Info("")
+	scanner := bufio.NewScanner(strings.NewReader(string(out)))
+	for scanner.Scan() {
+		logrus.Info(scanner.Text())
+	}
+
+	return
 }
 
 func run() (err error) {

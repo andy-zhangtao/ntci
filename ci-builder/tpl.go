@@ -38,23 +38,27 @@ echo 'set {{.}}'
 set {{.}}
 {{end}}
 
-echo "Environment"
+echo "------->Environment"
+echo " "
 env 
-echo "  "
+echo " "
 
 {{range .BeforeBuild}}
-echo '{{.}}'
+echo '-------> {{.}}'
+echo ' '
 {{.}} ||true
 {{end}}
 
 set -e
 {{range .Build}}
-echo '{{.}}'
+echo '-------> {{.}}'
+echo ' '
 {{.}} 2>&1
 {{end}}
 
 {{range .AfterBuild}}
-echo '{{.}}'
+echo '-------> {{.}}'
+echo ' '
 {{.}} ||true
 {{end}}
 `
