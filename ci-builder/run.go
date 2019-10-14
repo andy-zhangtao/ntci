@@ -111,6 +111,7 @@ func build(nt ntci) (err error) {
 	f.Close()
 
 	cmd := exec.Command("sh", "/build.sh")
+	cmd.Env = append(os.Environ(), nt.Env...)
 	out, _ := cmd.CombinedOutput()
 
 	logrus.Info("===========Build Log===========")
