@@ -141,6 +141,7 @@ func run() (err error) {
 }
 
 func output() {
+	logrus.Info("")
 	f, err := os.Open("/build.log")
 	if err != nil {
 		logrus.Error(err.Error())
@@ -149,6 +150,7 @@ func output() {
 
 	defer f.Close()
 
+	logrus.Info("===========Build Log===========")
 	br := bufio.NewReader(f)
 	for {
 		a, _, c := br.ReadLine()
