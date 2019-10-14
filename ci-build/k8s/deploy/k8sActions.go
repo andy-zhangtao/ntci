@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/batch/v1"
@@ -54,6 +55,7 @@ func NewJob(b store.Build) (err error) {
 
 	// Clear build job after 10mins.
 	ttl := int32(60 * 10)
+	bf := int32(1)
 
 	job := v1.Job{
 		TypeMeta: metav1.TypeMeta{},
@@ -62,6 +64,7 @@ func NewJob(b store.Build) (err error) {
 			Namespace: kc.namespace,
 		},
 		Spec: v1.JobSpec{
+			BackoffLimit:            &bf,
 			TTLSecondsAfterFinished: &ttl,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
@@ -77,6 +80,10 @@ func NewJob(b store.Build) (err error) {
 								{
 									Name:  "NTCI_BUILDER_JID",
 									Value: b.Name,
+								},
+								{
+									Name:  "NTCI_BUILDER_ID",
+									Value: strconv.Itoa(b.Id),
 								},
 								{
 									Name:  "NTCI_BUILDER_GIT",

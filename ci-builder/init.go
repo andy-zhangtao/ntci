@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var jname string
 var jid string
 var buildAddr string
 var url string
@@ -16,6 +17,7 @@ var token string
 
 type gitMeta struct {
 	Name   string
+	Id     string
 	Root   string
 	Url    string
 	Branch string
@@ -29,9 +31,15 @@ func init() {
 	logrus.SetLevel(logrus.DebugLevel)
 
 	if os.Getenv("NTCI_BUILDER_JID") != "" {
-		jid = os.Getenv("NTCI_BUILDER_JID")
+		jname = os.Getenv("NTCI_BUILDER_JID")
 	} else {
 		logrus.Fatalf("NTCI_BUILDER_JID EMPTY!")
+	}
+
+	if os.Getenv("NTCI_BUILDER_ID") != "" {
+		jid = os.Getenv("NTCI_BUILDER_ID")
+	} else {
+		logrus.Fatalf("NTCI_BUILDER_ID EMPTY!")
 	}
 
 	if os.Getenv("NTCI_BUILDER_ADDR") != "" {
@@ -70,7 +78,8 @@ func init() {
 	}
 
 	gm = gitMeta{
-		Name:   jid,
+		Name:   jname,
+		Id:     jid,
 		Root:   r,
 		Url:    url,
 		Branch: branch,
@@ -82,7 +91,8 @@ func init() {
 
 func debugGM() {
 	logrus.Debug("=============================")
-	logrus.Debugf("Name: %s", gm.Name)
+	logrus.Debugf("Build Name: %s", gm.Name)
+	logrus.Debugf("Build ID: %s", gm.Id)
 	logrus.Debugf("Branch: %s", gm.Branch)
 	logrus.Debugf("Root: %s", gm.Root)
 	logrus.Debugf("Token: %s", gm.Token)

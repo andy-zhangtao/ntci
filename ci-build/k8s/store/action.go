@@ -1,10 +1,7 @@
 package store
 
 import (
-	"errors"
-	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -40,16 +37,12 @@ Update specify job status.
 // 4 - Build success
 //-4 - Build failed
 */
-func (p *PGBus) UpdataBuildStatus(status int32, jid string) (err error) {
-	j := strings.Split(jid, "-")
-	id, err := strconv.Atoi(j[1])
-	if err != nil {
-		return errors.New(fmt.Sprintf("Wrong Build ID: %s. Jid: %s", err.Error(), jid))
-	}
+func (p *PGBus) UpdataBuildStatus(status int32, name, id string) (err error) {
 
+	i, _ := strconv.Atoi(id)
 	b := Build{
-		Name: j[0],
-		Id:   id,
+		Name: name,
+		Id:   i,
 	}
 
 	return p.updateBuild(status, b)

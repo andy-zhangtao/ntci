@@ -43,11 +43,12 @@ func updateJobStatus(flag int32) (err error) {
 
 	c := build_rpc_v1.NewBuildServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	r, err := c.JobStatus(ctx, &build_rpc_v1.Builder{
-		Jid:    jid,
+		Jname:  gm.Name,
+		Jid:    gm.Id,
 		Status: flag,
 	})
 

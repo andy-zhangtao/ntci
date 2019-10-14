@@ -131,7 +131,7 @@ Update job status.
 */
 func (s *server) JobStatus(ctx context.Context, in *build_rpc_v1.Builder) (*build_rpc_v1.Reply, error) {
 
-	err := s.pg.UpdataBuildStatus(in.Status, in.Jid)
+	err := s.pg.UpdataBuildStatus(in.Status, in.Jname, in.Jid)
 	if err != nil {
 		return &build_rpc_v1.Reply{
 			Code:    -1,

@@ -42,10 +42,12 @@ message JobInfo {
 
 // Builder will update status via this message.
 message Builder {
+    // The build job name
+    string jname = 1;
     // The build job id
-    string jid = 1;
+    string jid = 2;
     // Job Status
-    int32 status = 2;
+    int32 status = 3;
 }
 
 service BuildService {
