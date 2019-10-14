@@ -113,7 +113,7 @@ func build(nt ntci) (err error) {
 	cmd := exec.Command("sh", "/build.sh")
 	cmd.Env = append(os.Environ(), nt.Env...)
 	cmd.Dir = fmt.Sprintf("%s/%s", gm.Root, gm.Name)
-	out, _ := cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 
 	logrus.Info("===========Build Log===========")
 	logrus.Info("")
@@ -122,7 +122,7 @@ func build(nt ntci) (err error) {
 		logrus.Info(scanner.Text())
 	}
 
-	return
+	return err
 }
 
 func run() (err error) {
