@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"time"
@@ -143,6 +144,35 @@ func (s *server) JobStatus(ctx context.Context, in *build_rpc_v1.Builder) (*buil
 		Code:    0,
 		Message: "OK",
 	}, nil
+}
+
+func (s *server) GetJobLog(in *build_rpc_v1.Job, ls build_rpc_v1.BuildService_GetJobLogServer) (err error) {
+	log := make(chan string)
+	defer close(log)
+
+	go func() {
+		for {
+			select {
+			case l := <-log:
+				ls.Send(&build_rpc_v1.Log{
+					Message: l,
+				})
+			}
+		}
+
+	}()
+
+	err = deploy.GetJobLog(in.Name, true, log)
+	if err != nil && err.Error() == "EOF" {
+		return errors.New("EOF")
+	}
+
+	if err != nil && err.Error() != "EOF" {
+		logrus.Error(err)
+		return
+	}
+
+	return
 }
 
 func start(port int) {

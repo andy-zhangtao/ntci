@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -118,4 +119,63 @@ func NewJob(b store.Build) (err error) {
 	logrus.Debugf("Job Pod Num: %d", j.Status.Succeeded)
 
 	return nil
+}
+
+func GetJobLog(jobname string, flowing bool, l chan string) (err error) {
+	pod, err := getPodOfJob(jobname)
+	if err != nil {
+		return
+	}
+
+	logrus.Debugf("Find pod %s of job %s", pod, jobname)
+
+	line := int64(1000)
+	req := kc.client.CoreV1().Pods(kc.namespace).GetLogs(pod, &apiv1.PodLogOptions{
+		TailLines: &line,
+		Follow:    flowing,
+	})
+
+	podLogs, err := req.Stream()
+	if err != nil {
+		return errors.New("error in opening stream")
+	}
+
+	defer podLogs.Close()
+
+	for {
+		data := make([]byte, 1024)
+		n, err := podLogs.Read(data)
+		logrus.Errorf("%d, err: %v", n, err)
+		if err != nil {
+			fmt.Print(string(data[:n]))
+			l <- string(data[:n])
+			logrus.Error(err.Error())
+			break
+		}
+
+		fmt.Print(string(data[:n]))
+		l <- string(data[:n])
+	}
+
+	return
+}
+
+func getPodOfJob(jobname string) (podname string, err error) {
+	selector := fmt.Sprintf("job-name=%s", jobname)
+
+	logrus.Debugf("Select Pod via %s", selector)
+
+	p, err := kc.client.CoreV1().Pods(kc.namespace).List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return
+	}
+
+	if len(p.Items) == 0 {
+		err = errors.New("Can not find the pod of this job. ")
+		return
+	}
+
+	return p.Items[0].Name, nil
 }

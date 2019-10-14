@@ -62,6 +62,6 @@ func updateJobStatus(flag int32) (err error) {
 		return errors.New("Invoke Build Service Failed ")
 	}
 
-	logrus.Infof("Update Status Success: %d", r.Code)
+	logrus.Debugf("Update Status Success: %d", r.Code)
 	return
 }
