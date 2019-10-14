@@ -74,7 +74,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 
 	c := build_rpc_v1.NewBuildServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	r, err := c.Run(ctx, &build_rpc_v1.Request{
