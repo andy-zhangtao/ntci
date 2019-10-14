@@ -65,7 +65,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	//s.url = push.Project.WebURL
 	s.id = push.ProjectID
-	s.branch = push.Ref
+	s.branch = drawOffBranch(push)
 	s.name = push.Project.Name
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
@@ -102,4 +102,18 @@ func drawOffUrl(p pushEvent) string {
 	s := strings.Split(p.Project.WebURL, end)
 
 	return s[0]
+}
+
+func drawOffBranch(p pushEvent) string {
+	branch := "master"
+
+	if p.Ref == "refs/heads/master" {
+		return branch
+	}
+
+	if strings.HasPrefix(p.Ref, "refs/heads/") {
+		branch = strings.Split(p.Ref, "refs/heads/")[1]
+	}
+
+	return branch
 }
