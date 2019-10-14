@@ -52,6 +52,9 @@ func InitK8sClient(bus *dataBus.DataBus) (err error) {
 
 func NewJob(b store.Build) (err error) {
 
+	// Clear build job after 10mins.
+	ttl := int32(60 * 10)
+
 	job := v1.Job{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
@@ -59,6 +62,7 @@ func NewJob(b store.Build) (err error) {
 			Namespace: kc.namespace,
 		},
 		Spec: v1.JobSpec{
+			TTLSecondsAfterFinished: &ttl,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("%s-%d", b.Name, b.Id),
