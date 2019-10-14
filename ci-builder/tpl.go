@@ -8,16 +8,24 @@ const buildTpl = `#!/bin/sh
 echo 'set {{.}}'
 set {{.}}
 {{end}}
+
+echo "Environment"
+env
+echo "  "
+
 {{range .BeforeBuild}}
 echo '{{.}}'
-sh "{{.}}" >> /build.log 2>&1 ||true
+{{.}} >> /build.log 2>&1 ||true
 {{end}}
+
+set -e
 {{range .Build}}
 echo '{{.}}'
-sh "{{.}}" >> /build.log 2>&1
+{{.}} >> /build.log 2>&1
 {{end}}
+
 {{range .AfterBuild}}
 echo '{{.}}'
-sh "{{.}}" >> /build.log 2>&1 ||true
+{{.}} >> /build.log 2>&1 ||true
 {{end}}
 `
