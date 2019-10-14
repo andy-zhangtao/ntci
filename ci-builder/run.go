@@ -111,10 +111,8 @@ func build(nt ntci) (err error) {
 	f.Close()
 
 	cmd := exec.Command("sh", "/build.sh")
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return err
-	}
+	out, _ := cmd.CombinedOutput()
+
 	logrus.Info("===========Build Log===========")
 	logrus.Info("")
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
