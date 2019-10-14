@@ -21,6 +21,6 @@ func main() {
 		logrus.Errorf("Build Execut Failed. %s", err.Error())
 	}
 
-	output()
+	//output()
 	logrus.Debugf("Build Finish")
 }
