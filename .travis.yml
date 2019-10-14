@@ -18,7 +18,7 @@ before_install:
 
 install:
   - go build -o bin/ntci ci-agent/main.go
-  - go build -o bin/k8s-build-server ci-build/k8s/*.go
+  - CGO_ENABLED=0 go build -o bin/k8s-build-server ci-build/k8s/*.go
   - go build -o bin/ntci-builder ci-builder/*.go
 
 after_script:
