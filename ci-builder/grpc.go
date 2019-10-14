@@ -10,6 +10,16 @@ import (
 	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
+const (
+	GitSuccess       = 1
+	GitFailed        = -1
+	NtciParseSuccess = 2
+	NtciParseFailed  = -2
+	Building         = 3
+	BuildSuccess     = 4
+	BuildFailed      = -4
+)
+
 //updateJobStatus
 //Invoke build server for update job status.
 //
