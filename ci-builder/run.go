@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -52,7 +54,7 @@ type ntci struct {
 func git() (err error) {
 	t := template.Must(template.New("git").Parse(cloneTpl))
 
-	f, err := os.Create("/build.sh")
+	f, err := os.Create("/git.sh")
 	if err != nil {
 		return err
 	}
@@ -64,7 +66,7 @@ func git() (err error) {
 
 	f.Close()
 
-	return exec.Command("sh", "/build.sh").Run()
+	return exec.Command("sh", "/git.sh").Run()
 }
 
 //parse
@@ -90,6 +92,26 @@ func parse(file string) (nt ntci, err error) {
 	return
 }
 
+//build
+//Execute build script by order.
+func build(nt ntci) (err error) {
+	t := template.Must(template.New("build").Parse(buildTpl))
+
+	f, err := os.Create("/build.sh")
+	if err != nil {
+		return err
+	}
+
+	err = t.Execute(f, gm)
+	if err != nil {
+		return err
+	}
+
+	f.Close()
+
+	return exec.Command("sh", "/build.sh").Run()
+}
+
 func run() (err error) {
 	if err := git(); err != nil {
 		return errors.New(fmt.Sprintf("Execute Git Script Error: %s", err.Error()))
@@ -102,12 +124,38 @@ func run() (err error) {
 		return errors.New(fmt.Sprintf("Parse .ntci.yml Error: %s", err.Error()))
 	}
 
-	logrus.Debug(".ntci.yml")
-	logrus.Debugf("  language: %s", nt.Language)
-	logrus.Debugf("  env: %s", nt.Env)
-	logrus.Debugf("  build: %s", nt.Build)
-	logrus.Debugf("  before build: %s", nt.BeforeBuild)
-	logrus.Debugf("  after build: %s", nt.AfterBuild)
-	logrus.Debug(" ")
+	logrus.Info(".ntci.yml")
+	logrus.Infof("  language: %s", nt.Language)
+	logrus.Infof("  env: %s", nt.Env)
+	logrus.Infof("  build: %s", nt.Build)
+	logrus.Infof("  before build: %s", nt.BeforeBuild)
+	logrus.Infof("  after build: %s", nt.AfterBuild)
+	logrus.Infof(" ")
+
+	err = build(nt)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Execute Build Error: %s", err.Error()))
+	}
+
 	return
+}
+
+func output() {
+	f, err := os.Open("/build.log")
+	if err != nil {
+		logrus.Error(err.Error())
+		return
+	}
+
+	defer f.Close()
+
+	br := bufio.NewReader(f)
+	for {
+		a, _, c := br.ReadLine()
+		if c == io.EOF {
+			break
+		}
+		logrus.Info(string(a))
+	}
+
 }
