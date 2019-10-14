@@ -35,30 +35,31 @@ cd {{.Root}}; git clone --branch {{.Branch}} "{{.Url}}" {{.Name}} 2>&1`
 const buildTpl = `#!/bin/sh
 {{range .Env}}
 echo 'set {{.}}'
-set {{.}}
+export {{.}}
 {{end}}
+echo " "
 
 echo "------->Environment"
 echo " "
-env 
+env |grep -v NTCI_BUILDER_TOKEN
 echo " "
 
 {{range .BeforeBuild}}
 echo '-------> {{.}}'
-echo ' '
 {{.}} ||true
 {{end}}
+echo ' '
 
 set -e
 {{range .Build}}
 echo '-------> {{.}}'
-echo ' '
 {{.}} 2>&1
 {{end}}
+echo ' '
 
 {{range .AfterBuild}}
 echo '-------> {{.}}'
-echo ' '
 {{.}} ||true
 {{end}}
+echo ' '
 `
