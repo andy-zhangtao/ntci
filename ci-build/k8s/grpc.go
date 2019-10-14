@@ -9,12 +9,36 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"ntci/ci-build/k8s/deploy"
 	"ntci/ci-build/k8s/store"
 	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
 type server struct {
 	pg *store.PGBus
+}
+
+/*
+fetch Image.
+
+If this build server don't contains specify language and version, then return false.
+
+Otherwise return true and fully image name.
+*/
+func fetchImage(language, version string) (bool, string) {
+
+	image := ""
+	if _, ok := bus.LanguageRuntime[language]; !ok {
+		return false, image
+	}
+
+	l := bus.LanguageRuntime[language]
+
+	if _, ok := l[version]; !ok {
+		return false, image
+	}
+
+	return true, fmt.Sprintf("%s:%s", l[version], version)
 }
 
 /*
@@ -40,18 +64,42 @@ Run() will store build info into db.
 */
 func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.Reply, error) {
 
-	logrus.Debugf("Receive Build Request. Name: %s Branch: %s Git: %s ID: %s ", in.Name, in.Branch, in.Url, in.Id)
+	logrus.Debugf("Receive Build Request. Name: %s Branch: %s Git: %s ID: %s Language: %s Ver: %s ", in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion)
 
-	err := s.pg.AddNewBuild(store.Build{
+	b := store.Build{
 		Name:      in.Name,
 		Branch:    in.Branch,
 		Git:       in.Url,
 		Timestamp: time.Now(),
-	})
+		Token:     bus.Token,
+		Addr:      bus.Addr,
+	}
 
+	isExist, image := fetchImage(in.Language, in.Lanversion)
+	if !isExist {
+		logrus.Errorf("Can not support this language: %s %s", in.Language, in.Lanversion)
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: fmt.Sprintf("Can not support this language: %s %s", in.Language, in.Lanversion),
+		}, nil
+	}
+
+	b.Image = image
+
+	id, err := s.pg.AddNewBuild(b)
 	if err != nil {
-
 		logrus.Errorf("Add Build Record Error: %s", err.Error())
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: err.Error(),
+		}, nil
+	}
+
+	b.Id = id
+
+	err = deploy.NewJob(b)
+	if err != nil {
+		logrus.Errorf("Create Build Job Error: %s", err.Error())
 		return &build_rpc_v1.Reply{
 			Code:    -1,
 			Message: err.Error(),
@@ -74,6 +122,27 @@ func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.Request) (*build_r
 	ji := new(build_rpc_v1.JobInfo)
 
 	return ji, nil
+}
+
+/*
+JobStatus
+
+Update job status.
+*/
+func (s *server) JobStatus(ctx context.Context, in *build_rpc_v1.Builder) (*build_rpc_v1.Reply, error) {
+
+	err := s.pg.UpdataBuildStatus(in.Status, in.Jid)
+	if err != nil {
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: err.Error(),
+		}, nil
+	}
+
+	return &build_rpc_v1.Reply{
+		Code:    0,
+		Message: "OK",
+	}, nil
 }
 
 func start(port int) {

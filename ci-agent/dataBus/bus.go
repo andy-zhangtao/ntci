@@ -18,14 +18,15 @@ Other package can get configure from this object.
 # Choose build mode
 build-mode="single"
 
+language=[
+		"go"
+	]
 [access.gitlab]
 	token="xxx" // The gitlab access token. Generate by user.
 
-[language]
+
 	# The language runtime image name
-	go=[
-		"name:tag"
-		]
+
 
 # User can use default agent.(single/k8s)
 # If user wants custom agent, it should implement ci-grpc/build/v1.proto
@@ -40,12 +41,13 @@ type dataBus struct {
 		} `toml:"gitlab"`
 	} `toml:"access"`
 
-	Language map[string][]string `toml:"language"`
+	//Language map[string][]string `toml:"language"`
+	//Language []string `toml:"language"`
 
 	// LanguageRuntime
 	// Format:
 	// map[language name] = map[tag]name
-	LanguageRuntime map[string]map[string]string
+	//LanguageRuntime map[string]map[string]string
 
 	// BuildMode
 	// This mode must exist in Build Sections
@@ -119,12 +121,12 @@ func debug() {
 		logrus.Debugf("GitLab Token: %s", bus.Access.Gitlab.Token)
 	}
 
-	for l, v := range bus.LanguageRuntime {
-		logrus.Debugf("Language: %s", l)
-		for tag, image := range v {
-			logrus.Debugf("  %s:%s", image, tag)
-		}
-	}
+	//for l, v := range bus.LanguageRuntime {
+	//	logrus.Debugf("Language: %s", l)
+	//	for tag, image := range v {
+	//		logrus.Debugf("  %s:%s", image, tag)
+	//	}
+	//}
 
 	logrus.Debugf("Build Mode: %s", bus.BuildMode)
 	for m, svc := range bus.Build {

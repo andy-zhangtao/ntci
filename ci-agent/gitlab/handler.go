@@ -19,11 +19,14 @@ id is this repository id.
 branch is trigger branch name.
 */
 type Service struct {
-	url    string
-	id     int
-	branch string
-	name   string
-	commit string
+	url        string
+	webURL     string
+	id         int
+	branch     string
+	name       string
+	commit     string
+	language   string
+	lanversion string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +38,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Debugf("gitlab request data. %s ", string(data))
+	//logrus.Debugf("gitlab request data. %s ", string(data))
 
 	var push pushEvent
 
@@ -62,12 +65,15 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	//s.url = push.Project.WebURL
 	s.id = push.ProjectID
-	s.branch = push.Ref
+	s.branch = drawOffBranch(push)
 	s.name = push.Project.Name
 	s.commit = push.CheckoutSha
+	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
 
 	n, err := git.ParseAndExecuteBuild(s)
+	logrus.Debugf("ntct.yml: %v", n)
+
 	if err != nil {
 		logrus.Errorf("Build Error. %s ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -75,7 +81,6 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Debugf("ntct.yml: %v", n)
 }
 
 /*
@@ -97,4 +102,18 @@ func drawOffUrl(p pushEvent) string {
 	s := strings.Split(p.Project.WebURL, end)
 
 	return s[0]
+}
+
+func drawOffBranch(p pushEvent) string {
+	branch := "master"
+
+	if p.Ref == "refs/heads/master" {
+		return branch
+	}
+
+	if strings.HasPrefix(p.Ref, "refs/heads/") {
+		branch = strings.Split(p.Ref, "refs/heads/")[1]
+	}
+
+	return branch
 }

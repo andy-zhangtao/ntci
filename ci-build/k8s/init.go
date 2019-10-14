@@ -6,6 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"ntci/ci-build/k8s/dataBus"
+	"ntci/ci-build/k8s/deploy"
 	"ntci/ci-build/k8s/store"
 )
 
@@ -30,6 +31,9 @@ func init() {
 	}
 
 	bus = b
-
 	store.PGInit(bus)
+
+	if err = deploy.InitK8sClient(bus); err != nil {
+		logrus.Fatalf("Kubernetes Init Error: %s", err.Error())
+	}
 }

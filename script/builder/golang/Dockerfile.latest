@@ -1,0 +1,4 @@
+FROM golang:latest
+COPY bin/ntci-builder /ntci-builder
+ENV  NTCI_BUILDER_ROOT=/go/src
+ENTRYPOINT ["/ntci-builder"]

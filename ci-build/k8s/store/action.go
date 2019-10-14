@@ -1,6 +1,11 @@
 package store
 
 import (
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -9,17 +14,45 @@ AddNewBuild
 
 Insert new build record.
 */
-func (p *PGBus) AddNewBuild(b Build) (err error) {
-	id, err := p.getNextId(b)
+func (p *PGBus) AddNewBuild(b Build) (id int, err error) {
+	id, err = p.getNextId(b)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	sql := "INSERT INTO build (name,id,branch,git,timestamp) VALUES ($1, $2, $3, $4, $5)"
+	sql := "INSERT INTO build (name,id,branch,git,timestamp,status) VALUES ($1, $2, $3, $4, $5,0)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 
 	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp)
-	return
+	return id, err
+}
+
+/*
+UpdataBuildStatus
+
+Update specify job status.
+// 0 - Ready
+// 1 - Git clone success
+//-1 - Git clone failed
+// 2 - Ntci parse success
+//-2 - Ntci parse failed
+// 3 - Building
+// 4 - Build success
+//-4 - Build failed
+*/
+func (p *PGBus) UpdataBuildStatus(status int32, jid string) (err error) {
+	j := strings.Split(jid, "-")
+	id, err := strconv.Atoi(j[1])
+	if err != nil {
+		return errors.New(fmt.Sprintf("Wrong Build ID: %s. Jid: %s", err.Error(), jid))
+	}
+
+	b := Build{
+		Name: j[0],
+		Id:   id,
+	}
+
+	return p.updateBuild(status, b)
 }
 
 /*
@@ -54,5 +87,12 @@ func (p *PGBus) addBuildId(b Build) error {
 	sql := "UPDATE id set id=id+1 WHERE name=$1"
 	logrus.Debugf("UPDATE ID SQL: %s ", sql)
 	_, err := p.db.Exec(sql, b.Name)
+	return err
+}
+
+func (p *PGBus) updateBuild(status int32, b Build) error {
+	sql := "UPDATE build SET status=$1 WHERE name=$2 and id=$3"
+	logrus.Debugf("UPDATE Build Status SQL: %s ", sql)
+	_, err := p.db.Exec(sql, status, b.Name, b.Id)
 	return err
 }

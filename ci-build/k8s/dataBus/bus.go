@@ -13,7 +13,7 @@ type DataBus struct {
 	// Service Listen Port
 	Port int `toml:"port"`
 
-	K8S map[string]k8sConf `toml:"k8s"`
+	K8S k8sConf `toml:"k8s"`
 	// Support build language
 	Language map[string][]string `toml:"language"`
 	// LanguageRuntime
@@ -22,6 +22,8 @@ type DataBus struct {
 	LanguageRuntime map[string]map[string]string
 	// Postgres metadata
 	Postgres string `toml:"postgres"`
+	Token    string `toml:"token"`
+	Addr     string `toml:"addr"`
 }
 
 /*
@@ -30,10 +32,8 @@ k8sConf
 Kubernetes metadata.
 */
 type k8sConf struct {
-	// K8s API Endpoint
-	Endpoint string `toml:"endpoint"`
-	// API Token. If use config file , this property can empty
-	Token string `toml:"token"`
+	// Namespace
+	Namespace string `toml:"namespace"`
 	// Config file path, if use token, this property can empty
 	Config string `toml:"config"`
 }
@@ -77,7 +77,7 @@ func drawOffImg(lan map[string][]string) map[string]map[string]string {
 		for _, v := range value {
 			if strings.Contains(v, ":") {
 				_v := strings.Split(v, ":")
-				image[_v[0]] = _v[1]
+				image[_v[1]] = _v[0]
 			} else {
 				image["latest"] = v
 			}
@@ -91,8 +91,12 @@ func drawOffImg(lan map[string][]string) map[string]map[string]string {
 
 func isValid(bus *DataBus) error {
 
-	if len(bus.K8S) == 0 {
-		return errors.New("No Valid Kubernetes! ")
+	if bus.K8S.Config == "" {
+		return errors.New("No Valid Kubernetes config file! ")
+	}
+
+	if bus.K8S.Namespace == "" {
+		bus.K8S.Namespace = "default"
 	}
 
 	if len(bus.LanguageRuntime) == 0 {
@@ -115,12 +119,9 @@ func debug(bus *DataBus) {
 	logrus.Debug("*************************************")
 	logrus.Debugf("Listen on: %d", bus.Port)
 
-	for name, k := range bus.K8S {
-		logrus.Debugf("Kubernetes: %s", name)
-		logrus.Debugf("  Endpoint: %s", k.Endpoint)
-		logrus.Debugf("  Token: %s", k.Token)
-		logrus.Debugf("  Config: %s", k.Config)
-	}
+	logrus.Debug("Kubernetes: ")
+	logrus.Debugf("  Namespace: %s", bus.K8S.Namespace)
+	logrus.Debugf("  Config: %s", bus.K8S.Config)
 
 	logrus.Debug("")
 
@@ -131,9 +132,12 @@ func debug(bus *DataBus) {
 		}
 	}
 
+	logrus.Debug("")
 	logrus.Debug("Postgres")
 	logrus.Debugf("  Endpoint: %s", bus.Postgres)
 	logrus.Debug("")
 
+	logrus.Debugf("Token: %s", bus.Token)
+	logrus.Debugf("Addr: %s", bus.Addr)
 	logrus.Debug("*************************************")
 }

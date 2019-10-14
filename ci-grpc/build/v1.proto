@@ -11,8 +11,12 @@ message Request {
     string url = 3;
     // commit id
     string id = 4;
+    // build language
+    string language = 5;
+    // default is "latest"
+    string lanversion = 6;
     // is query the latest build job. Only use in query actions.
-    bool latest = 5;
+    bool latest = 7;
 }
 
 message Reply {
@@ -36,6 +40,13 @@ message JobInfo {
     repeated JobDetail jd = 2;
 }
 
+// Builder will update status via this message.
+message Builder {
+    // The build job id
+    string jid = 1;
+    // Job Status
+    int32 status = 2;
+}
 
 service BuildService {
     rpc Run (Request) returns (Reply) {
@@ -47,5 +58,7 @@ service BuildService {
     rpc GetJob (Request) returns (JobInfo) {
     }
 
-
+    // Builder update status via this rpc.
+    rpc JobStatus (Builder) returns (Reply) {
+    }
 }
