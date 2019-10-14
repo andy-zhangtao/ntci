@@ -102,7 +102,7 @@ func build(nt ntci) (err error) {
 		return err
 	}
 
-	err = t.Execute(f, gm)
+	err = t.Execute(f, nt)
 	if err != nil {
 		return err
 	}
