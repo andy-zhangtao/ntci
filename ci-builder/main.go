@@ -16,8 +16,9 @@ import "github.com/sirupsen/logrus"
 // NTCI_BUILDER_BRANCH 	git branch
 // NTCI_BUILDER_ADDR	build server addr
 func main() {
+	//Whatever the result fo build, builder should return sucess.
 	if err := run(); err != nil {
-		logrus.Fatalf(err.Error())
+		logrus.Errorf("Build Execut Failed. %s", err.Error())
 	}
 
 	logrus.Debugf("Build Finish")
