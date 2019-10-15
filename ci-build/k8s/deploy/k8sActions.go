@@ -103,9 +103,25 @@ func NewJob(b store.Build) (err error) {
 									Value: b.Addr,
 								},
 							},
+							VolumeMounts: []apiv1.VolumeMount{
+								{
+									Name:      "dockersock",
+									MountPath: "/var/run/docker.sock",
+								},
+							},
 						},
 					},
 					RestartPolicy: apiv1.RestartPolicyNever,
+					Volumes: []apiv1.Volume{
+						{
+							Name: "dockersock",
+							VolumeSource: apiv1.VolumeSource{
+								HostPath: &apiv1.HostPathVolumeSource{
+									Path: "/var/run/docker.sock",
+								},
+							},
+						},
+					},
 				},
 			},
 		},
