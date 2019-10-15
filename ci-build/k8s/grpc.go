@@ -153,7 +153,11 @@ func (s *server) GetJobLog(in *build_rpc_v1.Job, ls build_rpc_v1.BuildService_Ge
 	go func() {
 		for {
 			select {
-			case l := <-log:
+
+			case l, ok := <-log:
+				if !ok {
+					return
+				}
 				ls.Send(&build_rpc_v1.Log{
 					Message: l,
 				})
