@@ -39,6 +39,7 @@ message JobDetail {
     string timestamp = 3;
     string branch = 4;
     string url = 5;
+    int32 id = 6;
 }
 
 message JobInfo {

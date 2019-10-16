@@ -71,7 +71,7 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 		Name:      in.Name,
 		Branch:    in.Branch,
 		Git:       in.Url,
-		Timestamp: time.Now(),
+		Timestamp: time.Now().Local(),
 		Token:     bus.Token,
 		Addr:      bus.Addr,
 		User:      in.User,
@@ -135,8 +135,10 @@ func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.JobRequest) (*buil
 			Timestamp: b.Timestamp.Format("2006-01-02 15:04:05"),
 			Branch:    b.Branch,
 			Url:       b.Git,
+			Id:        int32(b.Id),
 		})
 	}
+
 	return &build_rpc_v1.JobInfo{
 		Count: int32(len(jd)),
 		Jd:    jd,
