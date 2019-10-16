@@ -39,7 +39,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//logrus.Debugf("gitlab request data. %s ", string(data))
+	logrus.Debugf("gitlab request data. %s ", string(data))
 
 	var push pushEvent
 
