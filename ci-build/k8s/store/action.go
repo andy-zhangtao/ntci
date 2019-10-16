@@ -20,7 +20,7 @@ func (p *PGBus) AddNewBuild(b Build) (id int, err error) {
 	sql := "INSERT INTO build (name,id,branch,git,timestamp,status,owner) VALUES ($1, $2, $3, $4, $5,0,$6)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 
-	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp)
+	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp, b.User)
 	return id, err
 }
 
