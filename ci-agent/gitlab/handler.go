@@ -27,6 +27,7 @@ type Service struct {
 	commit     string
 	language   string
 	lanversion string
+	user       string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +71,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
+	s.user = push.UserEmail
 
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)
