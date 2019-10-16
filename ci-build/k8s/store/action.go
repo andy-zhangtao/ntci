@@ -27,15 +27,16 @@ func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 		}
 	}
 
-	for {
-		if rows.Next() {
-			var b Build
-			if rows.Scan(&b) == nil {
-				bs = append(bs, b)
-			}
+	for rows.Next() {
+
+		b := Build{}
+		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User)
+		if err == nil {
+			bs = append(bs, b)
 		} else {
-			return
+			logrus.Error(err)
 		}
+
 	}
 }
 
