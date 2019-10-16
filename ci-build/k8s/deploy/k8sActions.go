@@ -13,6 +13,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"ntci/ci-build/k8s/dataBus"
 	"ntci/ci-build/k8s/store"
+	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
 /*
@@ -137,7 +138,7 @@ func NewJob(b store.Build) (err error) {
 	return nil
 }
 
-func GetJobLog(jobname string, flowing bool, l chan string) (err error) {
+func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJobLogServer) (err error) {
 	pod, err := getPodOfJob(jobname)
 	if err != nil {
 		return
@@ -164,13 +165,17 @@ func GetJobLog(jobname string, flowing bool, l chan string) (err error) {
 		logrus.Errorf("%d, err: %v", n, err)
 		if err != nil {
 			fmt.Print(string(data[:n]))
-			l <- string(data[:n])
-			logrus.Error(err.Error())
-			break
+			return ls.Send(&build_rpc_v1.Log{
+				Message: string(data[:n]),
+			})
 		}
 
 		fmt.Print(string(data[:n]))
-		l <- string(data[:n])
+		if ls.Send(&build_rpc_v1.Log{
+			Message: string(data[:n]),
+		}) != nil {
+			break
+		}
 	}
 
 	return
