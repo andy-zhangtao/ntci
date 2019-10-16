@@ -71,7 +71,11 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
+
 	s.user = push.UserEmail
+	if s.user == "" {
+		s.user = push.UserUsername
+	}
 
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)
