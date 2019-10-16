@@ -15,6 +15,14 @@ CREATE TABLE "ntci"."build" (
 ALTER TABLE "ntci"."build" OWNER TO "ntci";
 
 -- ----------------------------
+-- Indexes structure for table build
+-- ----------------------------
+CREATE INDEX "userAndName" ON "ntci"."build" USING btree (
+  "owner" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
 -- Primary Key structure for table build
 -- ----------------------------
 ALTER TABLE "ntci"."build" ADD CONSTRAINT "build_pkey" PRIMARY KEY ("name", "id", "owner");
