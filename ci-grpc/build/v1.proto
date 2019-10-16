@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "build.rpc.v1";
 
+// Request
+// Build Job Request
 message Request {
     // project name
     string name = 1;
@@ -29,6 +31,8 @@ message Reply {
     string message = 2;
 }
 
+// JobDetail
+// Job Detail Info
 message JobDetail {
     string name = 1;
     int32 status = 2;
@@ -42,6 +46,12 @@ message JobInfo {
     repeated JobDetail jd = 2;
 }
 
+// JobRequest
+// Query Job Info via this message
+message JobRequest {
+    string owner = 1;
+    string name = 2;
+}
 // Builder will update status via this message.
 message Builder {
     // The build job name
@@ -55,6 +65,7 @@ message Builder {
 }
 
 message Job {
+    // Job Owner
     string name = 1;
 }
 
@@ -69,7 +80,7 @@ service BuildService {
     rpc Ping (Request) returns (Reply) {
     }
 
-    rpc GetJob (Request) returns (JobInfo) {
+    rpc GetJob (JobRequest) returns (JobInfo) {
     }
 
     // Builder update status via this rpc.

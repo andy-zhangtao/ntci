@@ -6,6 +6,33 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
+	sql := ""
+	if name == "" {
+		sql = "SELECT * FROM build where owner=$1"
+	} else {
+		sql = "SELECT * FROM build where owner=$1 AND name=$2"
+	}
+
+	logrus.Debugf("Select SQL: %s", sql)
+
+	rows, err := p.db.Query(sql, user, name)
+	if err != nil {
+		return
+	}
+
+	for {
+		if rows.Next() {
+			var b Build
+			if rows.Scan(&b) == nil {
+				bs = append(bs, b)
+			}
+		} else {
+			return
+		}
+	}
+}
+
 /*
 AddNewBuild
 

@@ -5,6 +5,7 @@ import "time"
 type Build struct {
 	Name      string
 	Branch    string
+	Status    int
 	Id        int
 	Git       string
 	Timestamp time.Time

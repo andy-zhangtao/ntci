@@ -119,11 +119,28 @@ GetJob
 
 Return JobInfo. If user wants the latest build, it will return the latest one. Otherwise it will return the latest 15 ones.
 */
-func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.JobInfo, error) {
+func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.JobRequest) (*build_rpc_v1.JobInfo, error) {
 
-	ji := new(build_rpc_v1.JobInfo)
+	var jd []*build_rpc_v1.JobDetail
 
-	return ji, nil
+	bs, err := s.pg.GetBuild(in.Owner, in.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, b := range bs {
+		jd = append(jd, &build_rpc_v1.JobDetail{
+			Name:      b.Name,
+			Status:    int32(b.Status),
+			Timestamp: b.Timestamp.Format("2006-01-02 15:04:05"),
+			Branch:    b.Branch,
+			Url:       b.Git,
+		})
+	}
+	return &build_rpc_v1.JobInfo{
+		Count: int32(len(jd)),
+		Jd:    jd,
+	}, nil
 }
 
 /*
