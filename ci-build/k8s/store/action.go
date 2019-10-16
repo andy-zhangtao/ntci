@@ -17,7 +17,7 @@ func (p *PGBus) AddNewBuild(b Build) (id int, err error) {
 		return 0, err
 	}
 
-	sql := "INSERT INTO build (name,id,branch,git,timestamp,status) VALUES ($1, $2, $3, $4, $5,0)"
+	sql := "INSERT INTO build (name,id,branch,git,timestamp,status,user) VALUES ($1, $2, $3, $4, $5,0,$6)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 
 	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp)
@@ -37,12 +37,13 @@ Update specify job status.
 // 4 - Build success
 //-4 - Build failed
 */
-func (p *PGBus) UpdataBuildStatus(status int32, name, id string) (err error) {
+func (p *PGBus) UpdataBuildStatus(status int32, name, id, user string) (err error) {
 
 	i, _ := strconv.Atoi(id)
 	b := Build{
 		Name: name,
 		Id:   i,
+		User: user,
 	}
 
 	return p.updateBuild(status, b)
@@ -84,8 +85,8 @@ func (p *PGBus) addBuildId(b Build) error {
 }
 
 func (p *PGBus) updateBuild(status int32, b Build) error {
-	sql := "UPDATE build SET status=$1 WHERE name=$2 and id=$3"
+	sql := "UPDATE build SET status=$1 WHERE name=$2 and id=$3 and user=$4"
 	logrus.Debugf("UPDATE Build Status SQL: %s ", sql)
-	_, err := p.db.Exec(sql, status, b.Name, b.Id)
+	_, err := p.db.Exec(sql, status, b.Name, b.Id, b.User)
 	return err
 }

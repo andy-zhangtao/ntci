@@ -11,4 +11,5 @@ type Build struct {
 	Image     string
 	Token     string
 	Addr      string
+	User      string
 }

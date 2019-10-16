@@ -50,6 +50,7 @@ func updateJobStatus(flag int32) (err error) {
 		Jname:  gm.Name,
 		Jid:    gm.Id,
 		Status: flag,
+		User:   gm.User,
 	})
 
 	if err != nil {

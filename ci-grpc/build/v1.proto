@@ -17,6 +17,8 @@ message Request {
     string lanversion = 6;
     // is query the latest build job. Only use in query actions.
     bool latest = 7;
+    // build owner
+    string user = 8;
 }
 
 message Reply {
@@ -48,6 +50,8 @@ message Builder {
     string jid = 2;
     // Job Status
     int32 status = 3;
+    // Job Owner
+    string user = 4;
 }
 
 message Job {

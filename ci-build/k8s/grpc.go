@@ -65,7 +65,7 @@ Run() will store build info into db.
 */
 func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.Reply, error) {
 
-	logrus.Debugf("Receive Build Request. Name: %s Branch: %s Git: %s ID: %s Language: %s Ver: %s ", in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion)
+	logrus.Debugf("Receive Build Request. User: %s Name: %s Branch: %s Git: %s ID: %s Language: %s Ver: %s ", in.User, in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion)
 
 	b := store.Build{
 		Name:      in.Name,
@@ -74,6 +74,7 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 		Timestamp: time.Now(),
 		Token:     bus.Token,
 		Addr:      bus.Addr,
+		User:      in.User,
 	}
 
 	isExist, image := fetchImage(in.Language, in.Lanversion)
@@ -132,7 +133,7 @@ Update job status.
 */
 func (s *server) JobStatus(ctx context.Context, in *build_rpc_v1.Builder) (*build_rpc_v1.Reply, error) {
 
-	err := s.pg.UpdataBuildStatus(in.Status, in.Jname, in.Jid)
+	err := s.pg.UpdataBuildStatus(in.Status, in.Jname, in.Jid, in.User)
 	if err != nil {
 		return &build_rpc_v1.Reply{
 			Code:    -1,

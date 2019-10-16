@@ -22,6 +22,7 @@ type gitMeta struct {
 	Url    string
 	Branch string
 	Token  string
+	User   string
 }
 
 var gm gitMeta
@@ -29,15 +30,29 @@ var gm gitMeta
 func init() {
 
 	logrus.SetLevel(logrus.DebugLevel)
+	gm = gitMeta{
+		//Name:   jname,
+		//Id:     jid,
+		//Root:   r,
+		//Url:    url,
+		//Branch: branch,
+		//Token:  token,
+	}
+
+	if os.Getenv("NTCI_BUILDER_USER") != "" {
+		gm.User = os.Getenv("NTCI_BUILDER_USER")
+	} else {
+		logrus.Fatalf("NTCI_BUILDER_USER EMPTY!")
+	}
 
 	if os.Getenv("NTCI_BUILDER_JID") != "" {
-		jname = os.Getenv("NTCI_BUILDER_JID")
+		gm.Name = os.Getenv("NTCI_BUILDER_JID")
 	} else {
 		logrus.Fatalf("NTCI_BUILDER_JID EMPTY!")
 	}
 
 	if os.Getenv("NTCI_BUILDER_ID") != "" {
-		jid = os.Getenv("NTCI_BUILDER_ID")
+		gm.Id = os.Getenv("NTCI_BUILDER_ID")
 	} else {
 		logrus.Fatalf("NTCI_BUILDER_ID EMPTY!")
 	}
@@ -55,14 +70,14 @@ func init() {
 	}
 
 	if os.Getenv("NTCI_BUILDER_BRANCH") != "" {
-		branch = os.Getenv("NTCI_BUILDER_BRANCH")
+		gm.Branch = os.Getenv("NTCI_BUILDER_BRANCH")
 	} else {
 		logrus.Fatalf("NTCI_BUILDER_BRANCH EMPTY!")
 	}
 
-	r := "~"
+	gm.Root = "~"
 	if os.Getenv("NTCI_BUILDER_ROOT") != "" {
-		r = os.Getenv("NTCI_BUILDER_ROOT")
+		gm.Root = os.Getenv("NTCI_BUILDER_ROOT")
 	}
 
 	if os.Getenv("NTCI_BUILDER_TOKEN") != "" {
@@ -77,15 +92,8 @@ func init() {
 		}
 	}
 
-	gm = gitMeta{
-		Name:   jname,
-		Id:     jid,
-		Root:   r,
-		Url:    url,
-		Branch: branch,
-		Token:  token,
-	}
-
+	gm.Token = token
+	gm.Url = url
 	debugGM()
 }
 
@@ -93,6 +101,7 @@ func debugGM() {
 	logrus.Debug("=============================")
 	logrus.Debugf("Build Name: %s", gm.Name)
 	logrus.Debugf("Build ID: %s", gm.Id)
+	logrus.Debugf("Build User: %s", gm.User)
 	logrus.Debugf("Branch: %s", gm.Branch)
 	logrus.Debugf("Root: %s", gm.Root)
 	logrus.Debugf("Token: %s", gm.Token)
