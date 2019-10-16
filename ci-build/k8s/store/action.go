@@ -38,6 +38,8 @@ func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 		}
 
 	}
+
+	return
 }
 
 /*
