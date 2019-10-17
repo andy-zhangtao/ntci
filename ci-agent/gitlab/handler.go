@@ -61,12 +61,12 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	commits := len(push.Commits)
 	s.id = push.ProjectID
 	s.branch = drawOffBranch(push)
-	s.name = push.Commits[commits-1].Author.Email
+	s.name = push.Project.Name
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
 
-	s.user = push.UserEmail
+	s.user = push.Commits[commits-1].Author.Email
 	if s.user == "" {
 		s.user = push.UserUsername
 	}
