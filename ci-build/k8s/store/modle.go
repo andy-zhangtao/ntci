@@ -13,4 +13,6 @@ type Build struct {
 	Token     string
 	Addr      string
 	User      string
+	Sha       string
+	Message   string
 }

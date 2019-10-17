@@ -86,6 +86,8 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		Language:   s.language,
 		Lanversion: s.lanversion,
 		User:       s.user,
+		Sha:        s.sha,
+		Message:    s.message,
 	})
 
 	if err != nil {

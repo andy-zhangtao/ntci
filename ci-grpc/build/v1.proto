@@ -21,6 +21,10 @@ message Request {
     bool latest = 7;
     // build owner
     string user = 8;
+    // checkout_sha
+    string sha = 9;
+    // the latest commit message
+    string message = 10;
 }
 
 message Reply {

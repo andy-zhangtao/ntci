@@ -80,6 +80,10 @@ func NewJob(b store.Build) (err error) {
 							Image: b.Image,
 							Env: []apiv1.EnvVar{
 								{
+									Name:  "NTCI_BUILDER_SHA",
+									Value: b.Sha,
+								},
+								{
 									Name:  "NTCI_BUILDER_USER",
 									Value: b.User,
 								},

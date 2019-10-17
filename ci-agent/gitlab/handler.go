@@ -28,6 +28,8 @@ type Service struct {
 	language   string
 	lanversion string
 	user       string
+	sha        string
+	message    string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +72,9 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	if s.user == "" {
 		s.user = push.UserUsername
 	}
+
+	s.sha = push.CheckoutSha[:12]
+	s.message = push.Commits[commits-1].Message
 
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)

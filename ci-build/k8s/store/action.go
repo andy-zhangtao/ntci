@@ -30,7 +30,7 @@ func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 	for rows.Next() {
 
 		b := Build{}
-		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User)
+		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message)
 		if err == nil {
 			bs = append(bs, b)
 		} else {
@@ -53,10 +53,10 @@ func (p *PGBus) AddNewBuild(b Build) (id int, err error) {
 		return 0, err
 	}
 
-	sql := "INSERT INTO build (name,id,branch,git,timestamp,status,owner) VALUES ($1, $2, $3, $4, $5,0,$6)"
+	sql := "INSERT INTO build (name,id,branch,git,timestamp,status,owner, sha, message) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 
-	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp, b.User)
+	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp, b.User, b.Sha, b.Message)
 	return id, err
 }
 
