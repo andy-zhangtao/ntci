@@ -5,7 +5,7 @@ cd {{.Root}}; git clone --branch {{.Branch}} "{{.Url}}" {{.Name}} 2>&1`
 
 const buildTpl = `#!/bin/sh
 echo "------->Commit SHA"
-env $NTCI_BUILDER_SHA
+echo $NTCI_BUILDER_SHA
 echo ""
 echo "------->Environment"
 echo ""
