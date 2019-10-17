@@ -68,7 +68,8 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 
 	conn, err := grpc.Dial(bus.Build[bus.BuildMode].Addr, grpc.WithInsecure())
 	if err != nil {
-		logrus.Fatalf("did not connect: %v", err)
+		logrus.Errorf("did not connect: %v", err)
+		return err
 	}
 	defer conn.Close()
 
@@ -84,6 +85,9 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		Url:        s.webURL,
 		Language:   s.language,
 		Lanversion: s.lanversion,
+		User:       s.user,
+		Sha:        s.sha,
+		Message:    s.message,
 	})
 
 	if err != nil {

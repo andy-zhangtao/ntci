@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"time"
@@ -64,15 +65,18 @@ Run() will store build info into db.
 */
 func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.Reply, error) {
 
-	logrus.Debugf("Receive Build Request. Name: %s Branch: %s Git: %s ID: %s Language: %s Ver: %s ", in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion)
+	logrus.Debugf("Receive Build Request. User: %s Name: %s Branch: %s Git: %s ID: %s Language: %s Ver: %s. Sha: %s Message: %s ", in.User, in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion, in.Sha, in.Message)
 
 	b := store.Build{
 		Name:      in.Name,
 		Branch:    in.Branch,
 		Git:       in.Url,
-		Timestamp: time.Now(),
+		Timestamp: time.Now().Local(),
 		Token:     bus.Token,
 		Addr:      bus.Addr,
+		User:      in.User,
+		Sha:       in.Sha,
+		Message:   in.Message,
 	}
 
 	isExist, image := fetchImage(in.Language, in.Lanversion)
@@ -117,11 +121,32 @@ GetJob
 
 Return JobInfo. If user wants the latest build, it will return the latest one. Otherwise it will return the latest 15 ones.
 */
-func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.JobInfo, error) {
+func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.JobRequest) (*build_rpc_v1.JobInfo, error) {
 
-	ji := new(build_rpc_v1.JobInfo)
+	var jd []*build_rpc_v1.JobDetail
 
-	return ji, nil
+	bs, err := s.pg.GetBuild(in.Owner, in.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, b := range bs {
+		jd = append(jd, &build_rpc_v1.JobDetail{
+			Name:      b.Name,
+			Status:    int32(b.Status),
+			Timestamp: b.Timestamp.Format("2006-01-02 15:04:05"),
+			Branch:    b.Branch,
+			Url:       b.Git,
+			Id:        int32(b.Id),
+			Sha:       b.Sha,
+			Message:   b.Message,
+		})
+	}
+
+	return &build_rpc_v1.JobInfo{
+		Count: int32(len(jd)),
+		Jd:    jd,
+	}, nil
 }
 
 /*
@@ -131,7 +156,7 @@ Update job status.
 */
 func (s *server) JobStatus(ctx context.Context, in *build_rpc_v1.Builder) (*build_rpc_v1.Reply, error) {
 
-	err := s.pg.UpdataBuildStatus(in.Status, in.Jid)
+	err := s.pg.UpdataBuildStatus(in.Status, in.Jname, in.Jid, in.User)
 	if err != nil {
 		return &build_rpc_v1.Reply{
 			Code:    -1,
@@ -143,6 +168,21 @@ func (s *server) JobStatus(ctx context.Context, in *build_rpc_v1.Builder) (*buil
 		Code:    0,
 		Message: "OK",
 	}, nil
+}
+
+func (s *server) GetJobLog(in *build_rpc_v1.Job, ls build_rpc_v1.BuildService_GetJobLogServer) (err error) {
+
+	err = deploy.GetJobLog(in.Name, true, ls)
+	if err != nil && err.Error() == "EOF" {
+		return errors.New("EOF")
+	}
+
+	if err != nil && err.Error() != "EOF" {
+		logrus.Error(err)
+		return
+	}
+
+	return
 }
 
 func start(port int) {

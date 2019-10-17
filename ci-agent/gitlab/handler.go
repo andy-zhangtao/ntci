@@ -27,6 +27,9 @@ type Service struct {
 	commit     string
 	language   string
 	lanversion string
+	user       string
+	sha        string
+	message    string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +41,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//logrus.Debugf("gitlab request data. %s ", string(data))
+	logrus.Debugf("gitlab request data. %s ", string(data))
 
 	var push pushEvent
 
@@ -57,19 +60,21 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//gitService := new(Service)
-	//gitService.url = push.Project.WebURL
-	//gitService.id = push.ProjectID
-	//gitService.branch = push.Ref
-	//gitService.url = drawOffUrl(push)
-
-	//s.url = push.Project.WebURL
+	commits := len(push.Commits)
 	s.id = push.ProjectID
 	s.branch = drawOffBranch(push)
 	s.name = push.Project.Name
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
+
+	s.user = push.Commits[commits-1].Author.Email
+	if s.user == "" {
+		s.user = push.UserUsername
+	}
+
+	s.sha = push.CheckoutSha[:12]
+	s.message = push.Commits[commits-1].Message
 
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)

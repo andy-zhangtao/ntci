@@ -24,6 +24,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Request
+// Build Job Request
 type Request struct {
 	// project name
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -38,7 +40,13 @@ type Request struct {
 	// default is "latest"
 	Lanversion string `protobuf:"bytes,6,opt,name=lanversion,proto3" json:"lanversion,omitempty"`
 	// is query the latest build job. Only use in query actions.
-	Latest               bool     `protobuf:"varint,7,opt,name=latest,proto3" json:"latest,omitempty"`
+	Latest bool `protobuf:"varint,7,opt,name=latest,proto3" json:"latest,omitempty"`
+	// build owner
+	User string `protobuf:"bytes,8,opt,name=user,proto3" json:"user,omitempty"`
+	// checkout_sha
+	Sha string `protobuf:"bytes,9,opt,name=sha,proto3" json:"sha,omitempty"`
+	// the latest commit message
+	Message              string   `protobuf:"bytes,10,opt,name=message,proto3" json:"message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -118,6 +126,27 @@ func (m *Request) GetLatest() bool {
 	return false
 }
 
+func (m *Request) GetUser() string {
+	if m != nil {
+		return m.User
+	}
+	return ""
+}
+
+func (m *Request) GetSha() string {
+	if m != nil {
+		return m.Sha
+	}
+	return ""
+}
+
+func (m *Request) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 type Reply struct {
 	// 0 - success
 	// other - failed
@@ -168,12 +197,24 @@ func (m *Reply) GetMessage() string {
 	return ""
 }
 
+// JobDetail
+// Job Detail Info
 type JobDetail struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// 1 - Git clone success
+	//-1 - Git clone failed
+	// 2 - Ntci parse success
+	//-2 - Ntci parse failed
+	// 3 - Building
+	// 4 - Build success
+	//-4 - Build failed
 	Status               int32    `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
 	Timestamp            string   `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Branch               string   `protobuf:"bytes,4,opt,name=branch,proto3" json:"branch,omitempty"`
 	Url                  string   `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
+	Id                   int32    `protobuf:"varint,6,opt,name=id,proto3" json:"id,omitempty"`
+	Sha                  string   `protobuf:"bytes,7,opt,name=sha,proto3" json:"sha,omitempty"`
+	Message              string   `protobuf:"bytes,8,opt,name=message,proto3" json:"message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -239,6 +280,27 @@ func (m *JobDetail) GetUrl() string {
 	return ""
 }
 
+func (m *JobDetail) GetId() int32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *JobDetail) GetSha() string {
+	if m != nil {
+		return m.Sha
+	}
+	return ""
+}
+
+func (m *JobDetail) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 type JobInfo struct {
 	Count                int32        `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
 	Jd                   []*JobDetail `protobuf:"bytes,2,rep,name=jd,proto3" json:"jd,omitempty"`
@@ -286,12 +348,65 @@ func (m *JobInfo) GetJd() []*JobDetail {
 	return nil
 }
 
+// JobRequest
+// Query Job Info via this message
+type JobRequest struct {
+	Owner                string   `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *JobRequest) Reset()         { *m = JobRequest{} }
+func (m *JobRequest) String() string { return proto.CompactTextString(m) }
+func (*JobRequest) ProtoMessage()    {}
+func (*JobRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2e4aa7d76fd7ee8a, []int{4}
+}
+
+func (m *JobRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_JobRequest.Unmarshal(m, b)
+}
+func (m *JobRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_JobRequest.Marshal(b, m, deterministic)
+}
+func (m *JobRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JobRequest.Merge(m, src)
+}
+func (m *JobRequest) XXX_Size() int {
+	return xxx_messageInfo_JobRequest.Size(m)
+}
+func (m *JobRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_JobRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JobRequest proto.InternalMessageInfo
+
+func (m *JobRequest) GetOwner() string {
+	if m != nil {
+		return m.Owner
+	}
+	return ""
+}
+
+func (m *JobRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
 // Builder will update status via this message.
 type Builder struct {
+	// The build job name
+	Jname string `protobuf:"bytes,1,opt,name=jname,proto3" json:"jname,omitempty"`
 	// The build job id
-	Jid string `protobuf:"bytes,1,opt,name=jid,proto3" json:"jid,omitempty"`
+	Jid string `protobuf:"bytes,2,opt,name=jid,proto3" json:"jid,omitempty"`
 	// Job Status
-	Status               int32    `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
+	Status int32 `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"`
+	// Job Owner
+	User                 string   `protobuf:"bytes,4,opt,name=user,proto3" json:"user,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -301,7 +416,7 @@ func (m *Builder) Reset()         { *m = Builder{} }
 func (m *Builder) String() string { return proto.CompactTextString(m) }
 func (*Builder) ProtoMessage()    {}
 func (*Builder) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2e4aa7d76fd7ee8a, []int{4}
+	return fileDescriptor_2e4aa7d76fd7ee8a, []int{5}
 }
 
 func (m *Builder) XXX_Unmarshal(b []byte) error {
@@ -322,6 +437,13 @@ func (m *Builder) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Builder proto.InternalMessageInfo
 
+func (m *Builder) GetJname() string {
+	if m != nil {
+		return m.Jname
+	}
+	return ""
+}
+
 func (m *Builder) GetJid() string {
 	if m != nil {
 		return m.Jid
@@ -336,42 +458,138 @@ func (m *Builder) GetStatus() int32 {
 	return 0
 }
 
+func (m *Builder) GetUser() string {
+	if m != nil {
+		return m.User
+	}
+	return ""
+}
+
+type Job struct {
+	// Job Owner
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Job) Reset()         { *m = Job{} }
+func (m *Job) String() string { return proto.CompactTextString(m) }
+func (*Job) ProtoMessage()    {}
+func (*Job) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2e4aa7d76fd7ee8a, []int{6}
+}
+
+func (m *Job) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Job.Unmarshal(m, b)
+}
+func (m *Job) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Job.Marshal(b, m, deterministic)
+}
+func (m *Job) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Job.Merge(m, src)
+}
+func (m *Job) XXX_Size() int {
+	return xxx_messageInfo_Job.Size(m)
+}
+func (m *Job) XXX_DiscardUnknown() {
+	xxx_messageInfo_Job.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Job proto.InternalMessageInfo
+
+func (m *Job) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type Log struct {
+	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Log) Reset()         { *m = Log{} }
+func (m *Log) String() string { return proto.CompactTextString(m) }
+func (*Log) ProtoMessage()    {}
+func (*Log) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2e4aa7d76fd7ee8a, []int{7}
+}
+
+func (m *Log) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Log.Unmarshal(m, b)
+}
+func (m *Log) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Log.Marshal(b, m, deterministic)
+}
+func (m *Log) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Log.Merge(m, src)
+}
+func (m *Log) XXX_Size() int {
+	return xxx_messageInfo_Log.Size(m)
+}
+func (m *Log) XXX_DiscardUnknown() {
+	xxx_messageInfo_Log.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Log proto.InternalMessageInfo
+
+func (m *Log) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Request)(nil), "Request")
 	proto.RegisterType((*Reply)(nil), "Reply")
 	proto.RegisterType((*JobDetail)(nil), "JobDetail")
 	proto.RegisterType((*JobInfo)(nil), "JobInfo")
+	proto.RegisterType((*JobRequest)(nil), "JobRequest")
 	proto.RegisterType((*Builder)(nil), "Builder")
+	proto.RegisterType((*Job)(nil), "Job")
+	proto.RegisterType((*Log)(nil), "Log")
 }
 
 func init() { proto.RegisterFile("v1.proto", fileDescriptor_2e4aa7d76fd7ee8a) }
 
 var fileDescriptor_2e4aa7d76fd7ee8a = []byte{
-	// 374 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x92, 0xbd, 0xee, 0xd3, 0x30,
-	0x14, 0xc5, 0x9b, 0xef, 0xf4, 0x52, 0x55, 0xc8, 0x42, 0xc8, 0x44, 0xa8, 0x54, 0x99, 0x3a, 0x59,
-	0x6a, 0x2b, 0x26, 0xb6, 0x0a, 0x09, 0xd1, 0x09, 0xb9, 0x1b, 0x9b, 0x93, 0x98, 0xe2, 0x2a, 0xb1,
-	0x43, 0xec, 0x44, 0x62, 0x62, 0xe3, 0x65, 0x78, 0x49, 0x14, 0xc7, 0xff, 0xb6, 0x43, 0xbb, 0x9d,
-	0x73, 0xae, 0x6c, 0xff, 0xee, 0x49, 0x20, 0x1d, 0xb6, 0xa4, 0xed, 0x94, 0x51, 0xf9, 0x3f, 0x0f,
-	0x12, 0xca, 0x7f, 0xf5, 0x5c, 0x1b, 0x84, 0x20, 0x94, 0xac, 0xe1, 0xd8, 0x5b, 0x7b, 0x9b, 0x39,
-	0xb5, 0x1a, 0xbd, 0x85, 0xb8, 0xe8, 0x98, 0x2c, 0x7f, 0x62, 0xdf, 0xa6, 0xce, 0xa1, 0xd7, 0x10,
-	0xf4, 0x5d, 0x8d, 0x03, 0x1b, 0x8e, 0x12, 0x2d, 0xc1, 0x17, 0x15, 0x0e, 0x6d, 0xe0, 0x8b, 0x0a,
-	0x65, 0x90, 0xd6, 0x4c, 0x9e, 0x7b, 0x76, 0xe6, 0x38, 0xb2, 0xe9, 0xd5, 0xa3, 0x15, 0x40, 0xcd,
-	0xe4, 0xc0, 0x3b, 0x2d, 0x94, 0xc4, 0xb1, 0x9d, 0xde, 0x25, 0xe3, 0xab, 0x35, 0x33, 0x5c, 0x1b,
-	0x9c, 0xac, 0xbd, 0x4d, 0x4a, 0x9d, 0xcb, 0x3f, 0x42, 0x44, 0x79, 0x5b, 0xff, 0x1e, 0x51, 0x4b,
-	0x55, 0x4d, 0xa8, 0x11, 0xb5, 0x1a, 0x61, 0x48, 0x1a, 0xae, 0xf5, 0xf8, 0xde, 0xc4, 0xfa, 0x62,
-	0xf3, 0x3f, 0x30, 0x3f, 0xaa, 0xe2, 0x33, 0x37, 0x4c, 0xd4, 0xcf, 0xb6, 0xd4, 0x86, 0x99, 0x5e,
-	0xdb, 0x93, 0x11, 0x75, 0x0e, 0xbd, 0x87, 0xb9, 0x11, 0x0d, 0xd7, 0x86, 0x35, 0xad, 0xdb, 0xf5,
-	0x16, 0xdc, 0x75, 0x13, 0x3e, 0xea, 0x26, 0xba, 0x76, 0x93, 0x7f, 0x82, 0xe4, 0xa8, 0x8a, 0xaf,
-	0xf2, 0x87, 0x42, 0x6f, 0x20, 0x2a, 0x55, 0x2f, 0x8d, 0x43, 0x9f, 0x0c, 0xca, 0xc0, 0xbf, 0x54,
-	0xd8, 0x5f, 0x07, 0x9b, 0x57, 0x3b, 0x20, 0x57, 0x58, 0xea, 0x5f, 0xaa, 0x7c, 0x0f, 0xc9, 0xa1,
-	0x17, 0x75, 0xc5, 0xbb, 0xf1, 0xe6, 0x8b, 0xa8, 0x1c, 0xfa, 0x28, 0x9f, 0x91, 0xef, 0xfe, 0x7a,
-	0xb0, 0xb0, 0xa7, 0x4e, 0xbc, 0x1b, 0x44, 0xc9, 0xd1, 0x3b, 0x08, 0x68, 0x2f, 0x51, 0x4a, 0xdc,
-	0xd7, 0xce, 0x62, 0x62, 0xab, 0xcc, 0x67, 0x28, 0x83, 0xf0, 0x9b, 0x90, 0xe7, 0x87, 0xb3, 0x15,
-	0xc4, 0x5f, 0xb8, 0x39, 0xaa, 0xe2, 0x6e, 0x9a, 0x12, 0xb7, 0x4c, 0x3e, 0x43, 0x1f, 0x6c, 0xb5,
-	0xa7, 0xa9, 0xae, 0x94, 0x38, 0xd0, 0xdb, 0x05, 0x87, 0xe5, 0xf7, 0x45, 0x31, 0x86, 0xa4, 0x6b,
-	0x4b, 0x32, 0x6c, 0x8b, 0xd8, 0xfe, 0x77, 0xfb, 0xff, 0x01, 0x00, 0x00, 0xff, 0xff, 0x83, 0x7c,
-	0xfa, 0xcf, 0x83, 0x02, 0x00, 0x00,
+	// 492 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x93, 0xcf, 0x8e, 0xd3, 0x3c,
+	0x14, 0xc5, 0x9b, 0xff, 0xc9, 0x9d, 0xd1, 0xe8, 0x93, 0x35, 0xfa, 0xe4, 0x09, 0x88, 0x29, 0x59,
+	0x75, 0x65, 0x31, 0x83, 0x60, 0xc3, 0x6e, 0x84, 0x84, 0xa8, 0x66, 0x81, 0x32, 0x3b, 0x24, 0x16,
+	0x4e, 0x62, 0xd2, 0x54, 0xa9, 0x5d, 0x6c, 0xa7, 0x88, 0x17, 0xe2, 0x25, 0x78, 0x24, 0x5e, 0x02,
+	0xd9, 0x71, 0xdb, 0x14, 0x95, 0xdd, 0x3d, 0x37, 0xba, 0xd7, 0xe7, 0xfc, 0xec, 0x40, 0xba, 0xbb,
+	0x23, 0x5b, 0x29, 0xb4, 0x28, 0x7e, 0x7b, 0x90, 0x94, 0xec, 0xdb, 0xc0, 0x94, 0x46, 0x08, 0x42,
+	0x4e, 0x37, 0x0c, 0x7b, 0x73, 0x6f, 0x91, 0x95, 0xb6, 0x46, 0xff, 0x43, 0x5c, 0x49, 0xca, 0xeb,
+	0x15, 0xf6, 0x6d, 0xd7, 0x29, 0xf4, 0x1f, 0x04, 0x83, 0xec, 0x71, 0x60, 0x9b, 0xa6, 0x44, 0x57,
+	0xe0, 0x77, 0x0d, 0x0e, 0x6d, 0xc3, 0xef, 0x1a, 0x94, 0x43, 0xda, 0x53, 0xde, 0x0e, 0xb4, 0x65,
+	0x38, 0xb2, 0xdd, 0x83, 0x46, 0x2f, 0x00, 0x7a, 0xca, 0x77, 0x4c, 0xaa, 0x4e, 0x70, 0x1c, 0xdb,
+	0xaf, 0x93, 0x8e, 0x39, 0xb5, 0xa7, 0x9a, 0x29, 0x8d, 0x93, 0xb9, 0xb7, 0x48, 0x4b, 0xa7, 0x8c,
+	0xc3, 0x41, 0x31, 0x89, 0xd3, 0xd1, 0xa1, 0xa9, 0x8d, 0x13, 0xb5, 0xa2, 0x38, 0x1b, 0x9d, 0xa8,
+	0x15, 0x45, 0x18, 0x92, 0x0d, 0x53, 0xca, 0x1c, 0x0c, 0xb6, 0xbb, 0x97, 0xc5, 0x1b, 0x88, 0x4a,
+	0xb6, 0xed, 0x7f, 0x98, 0x45, 0xb5, 0x68, 0xc6, 0xa8, 0x51, 0x69, 0xeb, 0xe9, 0x98, 0x7f, 0x3a,
+	0xf6, 0xcb, 0x83, 0x6c, 0x29, 0xaa, 0xf7, 0x4c, 0xd3, 0xae, 0xff, 0x17, 0x26, 0xa5, 0xa9, 0x1e,
+	0x94, 0x1d, 0x8d, 0x4a, 0xa7, 0xd0, 0x73, 0xc8, 0x74, 0xb7, 0x61, 0x4a, 0xd3, 0xcd, 0xd6, 0xc1,
+	0x3a, 0x36, 0x26, 0x70, 0xc3, 0x73, 0x70, 0xa3, 0xbf, 0xe1, 0xc6, 0x76, 0xb7, 0x81, 0xeb, 0x42,
+	0x27, 0x67, 0x43, 0xa7, 0xa7, 0xee, 0xdf, 0x41, 0xb2, 0x14, 0xd5, 0x47, 0xfe, 0x55, 0xa0, 0x6b,
+	0x88, 0x6a, 0x31, 0x70, 0xed, 0x72, 0x8f, 0x02, 0xe5, 0xe0, 0xaf, 0x1b, 0xec, 0xcf, 0x83, 0xc5,
+	0xc5, 0x3d, 0x90, 0x43, 0xd0, 0xd2, 0x5f, 0x37, 0xc5, 0x5b, 0x80, 0xa5, 0xa8, 0xf6, 0x2f, 0xe4,
+	0x1a, 0x22, 0xf1, 0x9d, 0x33, 0xe9, 0xb2, 0x8f, 0xe2, 0x00, 0xc4, 0x3f, 0x02, 0x29, 0xbe, 0x40,
+	0xf2, 0x30, 0x74, 0x7d, 0xc3, 0xa4, 0x19, 0x5a, 0x4f, 0x80, 0x8d, 0xc2, 0x24, 0x58, 0x77, 0x8d,
+	0x9b, 0x31, 0xe5, 0x84, 0x61, 0x70, 0xc2, 0x70, 0x7f, 0xe9, 0xe1, 0xf1, 0xd2, 0x8b, 0x1b, 0x08,
+	0x96, 0xa2, 0x3a, 0x77, 0x15, 0xc5, 0x2d, 0x04, 0x8f, 0xa2, 0x9d, 0xf2, 0xf0, 0x4e, 0x78, 0xdc,
+	0xff, 0xf4, 0xe0, 0xd2, 0x7a, 0x7b, 0x62, 0x72, 0xd7, 0xd5, 0x0c, 0xdd, 0x40, 0x50, 0x0e, 0x1c,
+	0xa5, 0xc4, 0xc5, 0xcc, 0x63, 0x62, 0x5f, 0x49, 0x31, 0x43, 0x39, 0x84, 0x9f, 0x3a, 0xde, 0x9e,
+	0xfd, 0xf6, 0x12, 0xe2, 0x0f, 0x4c, 0x1b, 0x1b, 0x17, 0xe4, 0xc8, 0x28, 0x4f, 0x89, 0xa3, 0x5d,
+	0xcc, 0xd0, 0xad, 0x7d, 0x37, 0x4f, 0x63, 0x8e, 0x94, 0x38, 0x22, 0x93, 0x1d, 0xcf, 0x20, 0x1b,
+	0x77, 0x18, 0xcb, 0xa1, 0x99, 0xcc, 0x43, 0xf2, 0x28, 0xda, 0x62, 0xf6, 0xca, 0x7b, 0xb8, 0xfa,
+	0x7c, 0x59, 0x99, 0x09, 0x22, 0xb7, 0x35, 0xd9, 0xdd, 0x55, 0xb1, 0xfd, 0x65, 0x5f, 0xff, 0x09,
+	0x00, 0x00, 0xff, 0xff, 0x9d, 0x30, 0x7e, 0x93, 0xbe, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -388,9 +606,10 @@ const _ = grpc.SupportPackageIsVersion4
 type BuildServiceClient interface {
 	Run(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
 	Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
-	GetJob(ctx context.Context, in *Request, opts ...grpc.CallOption) (*JobInfo, error)
+	GetJob(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*JobInfo, error)
 	// Builder update status via this rpc.
 	JobStatus(ctx context.Context, in *Builder, opts ...grpc.CallOption) (*Reply, error)
+	GetJobLog(ctx context.Context, in *Job, opts ...grpc.CallOption) (BuildService_GetJobLogClient, error)
 }
 
 type buildServiceClient struct {
@@ -419,7 +638,7 @@ func (c *buildServiceClient) Ping(ctx context.Context, in *Request, opts ...grpc
 	return out, nil
 }
 
-func (c *buildServiceClient) GetJob(ctx context.Context, in *Request, opts ...grpc.CallOption) (*JobInfo, error) {
+func (c *buildServiceClient) GetJob(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*JobInfo, error) {
 	out := new(JobInfo)
 	err := c.cc.Invoke(ctx, "/BuildService/GetJob", in, out, opts...)
 	if err != nil {
@@ -437,13 +656,46 @@ func (c *buildServiceClient) JobStatus(ctx context.Context, in *Builder, opts ..
 	return out, nil
 }
 
+func (c *buildServiceClient) GetJobLog(ctx context.Context, in *Job, opts ...grpc.CallOption) (BuildService_GetJobLogClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_BuildService_serviceDesc.Streams[0], "/BuildService/GetJobLog", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &buildServiceGetJobLogClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type BuildService_GetJobLogClient interface {
+	Recv() (*Log, error)
+	grpc.ClientStream
+}
+
+type buildServiceGetJobLogClient struct {
+	grpc.ClientStream
+}
+
+func (x *buildServiceGetJobLogClient) Recv() (*Log, error) {
+	m := new(Log)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // BuildServiceServer is the server API for BuildService service.
 type BuildServiceServer interface {
 	Run(context.Context, *Request) (*Reply, error)
 	Ping(context.Context, *Request) (*Reply, error)
-	GetJob(context.Context, *Request) (*JobInfo, error)
+	GetJob(context.Context, *JobRequest) (*JobInfo, error)
 	// Builder update status via this rpc.
 	JobStatus(context.Context, *Builder) (*Reply, error)
+	GetJobLog(*Job, BuildService_GetJobLogServer) error
 }
 
 // UnimplementedBuildServiceServer can be embedded to have forward compatible implementations.
@@ -456,11 +708,14 @@ func (*UnimplementedBuildServiceServer) Run(ctx context.Context, req *Request) (
 func (*UnimplementedBuildServiceServer) Ping(ctx context.Context, req *Request) (*Reply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
-func (*UnimplementedBuildServiceServer) GetJob(ctx context.Context, req *Request) (*JobInfo, error) {
+func (*UnimplementedBuildServiceServer) GetJob(ctx context.Context, req *JobRequest) (*JobInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetJob not implemented")
 }
 func (*UnimplementedBuildServiceServer) JobStatus(ctx context.Context, req *Builder) (*Reply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JobStatus not implemented")
+}
+func (*UnimplementedBuildServiceServer) GetJobLog(req *Job, srv BuildService_GetJobLogServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetJobLog not implemented")
 }
 
 func RegisterBuildServiceServer(s *grpc.Server, srv BuildServiceServer) {
@@ -504,7 +759,7 @@ func _BuildService_Ping_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 func _BuildService_GetJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(JobRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -516,7 +771,7 @@ func _BuildService_GetJob_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/BuildService/GetJob",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BuildServiceServer).GetJob(ctx, req.(*Request))
+		return srv.(BuildServiceServer).GetJob(ctx, req.(*JobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -537,6 +792,27 @@ func _BuildService_JobStatus_Handler(srv interface{}, ctx context.Context, dec f
 		return srv.(BuildServiceServer).JobStatus(ctx, req.(*Builder))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _BuildService_GetJobLog_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Job)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BuildServiceServer).GetJobLog(m, &buildServiceGetJobLogServer{stream})
+}
+
+type BuildService_GetJobLogServer interface {
+	Send(*Log) error
+	grpc.ServerStream
+}
+
+type buildServiceGetJobLogServer struct {
+	grpc.ServerStream
+}
+
+func (x *buildServiceGetJobLogServer) Send(m *Log) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 var _BuildService_serviceDesc = grpc.ServiceDesc{
@@ -560,6 +836,12 @@ var _BuildService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _BuildService_JobStatus_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetJobLog",
+			Handler:       _BuildService_GetJobLog_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "v1.proto",
 }

@@ -10,6 +10,16 @@ import (
 	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
+const (
+	GitSuccess       = 1
+	GitFailed        = -1
+	NtciParseSuccess = 2
+	NtciParseFailed  = -2
+	Building         = 3
+	BuildSuccess     = 4
+	BuildFailed      = -4
+)
+
 //updateJobStatus
 //Invoke build server for update job status.
 //
@@ -33,12 +43,14 @@ func updateJobStatus(flag int32) (err error) {
 
 	c := build_rpc_v1.NewBuildServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	r, err := c.JobStatus(ctx, &build_rpc_v1.Builder{
-		Jid:    jid,
+		Jname:  gm.Name,
+		Jid:    gm.Id,
 		Status: flag,
+		User:   gm.User,
 	})
 
 	if err != nil {
@@ -51,6 +63,6 @@ func updateJobStatus(flag int32) (err error) {
 		return errors.New("Invoke Build Service Failed ")
 	}
 
-	logrus.Infof("Update Status Success: %d", r.Code)
+	logrus.Debugf("Update Status Success: %d", r.Code)
 	return
 }

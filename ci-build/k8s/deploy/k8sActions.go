@@ -1,7 +1,9 @@
 package deploy
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/batch/v1"
@@ -11,6 +13,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"ntci/ci-build/k8s/dataBus"
 	"ntci/ci-build/k8s/store"
+	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
 /*
@@ -54,6 +57,7 @@ func NewJob(b store.Build) (err error) {
 
 	// Clear build job after 10mins.
 	ttl := int32(60 * 10)
+	bf := int32(1)
 
 	job := v1.Job{
 		TypeMeta: metav1.TypeMeta{},
@@ -62,6 +66,7 @@ func NewJob(b store.Build) (err error) {
 			Namespace: kc.namespace,
 		},
 		Spec: v1.JobSpec{
+			BackoffLimit:            &bf,
 			TTLSecondsAfterFinished: &ttl,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
@@ -75,8 +80,20 @@ func NewJob(b store.Build) (err error) {
 							Image: b.Image,
 							Env: []apiv1.EnvVar{
 								{
+									Name:  "NTCI_BUILDER_SHA",
+									Value: b.Sha,
+								},
+								{
+									Name:  "NTCI_BUILDER_USER",
+									Value: b.User,
+								},
+								{
 									Name:  "NTCI_BUILDER_JID",
 									Value: b.Name,
+								},
+								{
+									Name:  "NTCI_BUILDER_ID",
+									Value: strconv.Itoa(b.Id),
 								},
 								{
 									Name:  "NTCI_BUILDER_GIT",
@@ -95,9 +112,25 @@ func NewJob(b store.Build) (err error) {
 									Value: b.Addr,
 								},
 							},
+							VolumeMounts: []apiv1.VolumeMount{
+								{
+									Name:      "dockersock",
+									MountPath: "/var/run/docker.sock",
+								},
+							},
 						},
 					},
 					RestartPolicy: apiv1.RestartPolicyNever,
+					Volumes: []apiv1.Volume{
+						{
+							Name: "dockersock",
+							VolumeSource: apiv1.VolumeSource{
+								HostPath: &apiv1.HostPathVolumeSource{
+									Path: "/var/run/docker.sock",
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -111,4 +144,67 @@ func NewJob(b store.Build) (err error) {
 	logrus.Debugf("Job Pod Num: %d", j.Status.Succeeded)
 
 	return nil
+}
+
+func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJobLogServer) (err error) {
+	pod, err := getPodOfJob(jobname)
+	if err != nil {
+		return
+	}
+
+	logrus.Debugf("Find pod %s of job %s", pod, jobname)
+
+	line := int64(1000)
+	req := kc.client.CoreV1().Pods(kc.namespace).GetLogs(pod, &apiv1.PodLogOptions{
+		TailLines: &line,
+		Follow:    flowing,
+	})
+
+	podLogs, err := req.Stream()
+	if err != nil {
+		return errors.New("error in opening stream")
+	}
+
+	defer podLogs.Close()
+
+	for {
+		data := make([]byte, 1024)
+		n, err := podLogs.Read(data)
+		logrus.Errorf("%d, err: %v", n, err)
+		if err != nil {
+			fmt.Print(string(data[:n]))
+			return ls.Send(&build_rpc_v1.Log{
+				Message: string(data[:n]),
+			})
+		}
+
+		fmt.Print(string(data[:n]))
+		if ls.Send(&build_rpc_v1.Log{
+			Message: string(data[:n]),
+		}) != nil {
+			break
+		}
+	}
+
+	return
+}
+
+func getPodOfJob(jobname string) (podname string, err error) {
+	selector := fmt.Sprintf("job-name=%s", jobname)
+
+	logrus.Debugf("Select Pod via %s", selector)
+
+	p, err := kc.client.CoreV1().Pods(kc.namespace).List(metav1.ListOptions{
+		LabelSelector: selector,
+	})
+	if err != nil {
+		return
+	}
+
+	if len(p.Items) == 0 {
+		err = errors.New("Can not find the pod of this job. ")
+		return
+	}
+
+	return p.Items[0].Name, nil
 }

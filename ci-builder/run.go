@@ -113,7 +113,7 @@ func build(nt ntci) (err error) {
 	cmd := exec.Command("sh", "/build.sh")
 	cmd.Env = append(os.Environ(), nt.Env...)
 	cmd.Dir = fmt.Sprintf("%s/%s", gm.Root, gm.Name)
-	out, _ := cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 
 	logrus.Info("===========Build Log===========")
 	logrus.Info("")
@@ -122,21 +122,25 @@ func build(nt ntci) (err error) {
 		logrus.Info(scanner.Text())
 	}
 
-	return
+	return err
 }
 
 func run() (err error) {
 	if err := git(); err != nil {
+		updateJobStatus(GitFailed)
 		return errors.New(fmt.Sprintf("Execute Git Script Error: %s", err.Error()))
 	}
 
+	updateJobStatus(GitSuccess)
 	ntciConfig := fmt.Sprintf("%s/%s/.ntci.yml", gm.Root, gm.Name)
 
 	nt, err := parse(ntciConfig)
 	if err != nil {
+		updateJobStatus(NtciParseFailed)
 		return errors.New(fmt.Sprintf("Parse .ntci.yml Error: %s", err.Error()))
 	}
 
+	updateJobStatus(NtciParseSuccess)
 	logrus.Info(".ntci.yml")
 	logrus.Infof("  language: %s", nt.Language)
 	logrus.Infof("  env: %s", nt.Env)
@@ -145,11 +149,14 @@ func run() (err error) {
 	logrus.Infof("  after build: %s", nt.AfterBuild)
 	logrus.Infof(" ")
 
+	updateJobStatus(Building)
 	err = build(nt)
 	if err != nil {
+		updateJobStatus(BuildFailed)
 		return errors.New(fmt.Sprintf("Execute Build Error: %s", err.Error()))
 	}
 
+	updateJobStatus(BuildSuccess)
 	return
 }
 

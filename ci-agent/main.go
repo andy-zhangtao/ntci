@@ -7,10 +7,13 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"ntci/ci-agent/dataBus"
+	"ntci/ci-agent/rpc"
 	"ntci/ci-agent/web"
 )
 
 var port = 8000
+var gatewayPort = 8001
+
 var busFile = "ntci.toml"
 
 /***
@@ -20,6 +23,7 @@ var busFile = "ntci.toml"
 *
  */
 func main() {
+	go rpc.Run(gatewayPort)
 	web.Run(port)
 }
 
@@ -27,6 +31,11 @@ func init() {
 	p, err := strconv.Atoi(os.Getenv("CI_WEB_PORT"))
 	if err == nil {
 		port = p
+	}
+
+	p, err = strconv.Atoi(os.Getenv("CI_GATEWAY_PORT"))
+	if err == nil {
+		gatewayPort = p
 	}
 
 	switch strings.ToLower(os.Getenv("CI_WEB_LOG_LEVEL")) {

@@ -26,13 +26,6 @@ func PG() *PGBus {
 
 func PGInit(bus *dataBus.DataBus) {
 	pb = new(PGBus)
-	//connStr := ""
-	//
-	//if bus.Postgres.Passwd == "" {
-	//	connStr = fmt.Sprintf("postgres://%s@%s:%d/%s?sslmode=disable", bus.Postgres.User, bus.Postgres.Addr, bus.Postgres.Port, bus.Postgres.Name)
-	//} else {
-	//	connStr = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", bus.Postgres.User, bus.Postgres.Passwd, bus.Postgres.Addr, bus.Postgres.Port, bus.Postgres.Name)
-	//}
 
 	logrus.Debugf("Postgres Connstr: %s", bus.Postgres)
 
