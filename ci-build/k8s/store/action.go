@@ -7,6 +7,30 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func (p *PGBus) GetCommonEnv() (env map[string]string, err error) {
+	sql := "SELECT key, value FROM priavte_data WHERE owner=$1 AND name=$2"
+	var rows *_sql.Rows
+
+	rows, err = p.db.Query(sql, "super", "super")
+	if err != nil {
+		return
+	}
+
+	env = make(map[string]string)
+
+	for rows.Next() {
+		var key, value string
+		err = rows.Scan(&key, &value)
+		if err != nil {
+			logrus.Error(err)
+		} else {
+			env[key] = value
+		}
+	}
+
+	return
+}
+
 func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 	sql := ""
 	var rows *_sql.Rows

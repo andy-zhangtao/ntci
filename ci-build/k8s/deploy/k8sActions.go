@@ -53,11 +53,22 @@ func InitK8sClient(bus *dataBus.DataBus) (err error) {
 	return
 }
 
-func NewJob(b store.Build) (err error) {
+// NewJob
+// commenv is the common environment. Every user will use it.
+func NewJob(b store.Build, commenv map[string]string) (err error) {
 
 	// Clear build job after 10mins.
 	ttl := int32(60 * 10)
 	bf := int32(1)
+
+	var ev []apiv1.EnvVar
+
+	for key, value := range commenv {
+		ev = append(ev, apiv1.EnvVar{
+			Name:  key,
+			Value: value,
+		})
+	}
 
 	job := v1.Job{
 		TypeMeta: metav1.TypeMeta{},
@@ -134,6 +145,10 @@ func NewJob(b store.Build) (err error) {
 				},
 			},
 		},
+	}
+
+	for _, e := range ev {
+		job.Spec.Template.Spec.Containers[0].Env = append(job.Spec.Template.Spec.Containers[0].Env, e)
 	}
 
 	j, err := kc.client.BatchV1().Jobs(kc.namespace).Create(&job)

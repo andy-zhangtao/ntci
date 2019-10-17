@@ -90,6 +90,11 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 
 	b.Image = image
 
+	env, err := s.pg.GetCommonEnv()
+	if err != nil {
+		logrus.Error(err)
+	}
+
 	id, err := s.pg.AddNewBuild(b)
 	if err != nil {
 		logrus.Errorf("Add Build Record Error: %s", err.Error())
@@ -101,7 +106,7 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 
 	b.Id = id
 
-	err = deploy.NewJob(b)
+	err = deploy.NewJob(b, env)
 	if err != nil {
 		logrus.Errorf("Create Build Job Error: %s", err.Error())
 		return &build_rpc_v1.Reply{
