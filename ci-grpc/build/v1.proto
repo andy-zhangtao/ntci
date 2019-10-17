@@ -35,6 +35,13 @@ message Reply {
 // Job Detail Info
 message JobDetail {
     string name = 1;
+    // 1 - Git clone success
+    //-1 - Git clone failed
+    // 2 - Ntci parse success
+    //-2 - Ntci parse failed
+    // 3 - Building
+    // 4 - Build success
+    //-4 - Build failed
     int32 status = 2;
     string timestamp = 3;
     string branch = 4;

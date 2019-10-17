@@ -58,16 +58,10 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//gitService := new(Service)
-	//gitService.url = push.Project.WebURL
-	//gitService.id = push.ProjectID
-	//gitService.branch = push.Ref
-	//gitService.url = drawOffUrl(push)
-
-	//s.url = push.Project.WebURL
+	commits := len(push.Commits)
 	s.id = push.ProjectID
 	s.branch = drawOffBranch(push)
-	s.name = push.Project.Name
+	s.name = push.Commits[commits-1].Author.Email
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
