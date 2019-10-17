@@ -54,6 +54,8 @@ func (g *gateway) GetBuild(ctx context.Context, in *gateway_rpc_v1.BuildRequest)
 			Branch:    ji.Branch,
 			Url:       ji.Url,
 			Id:        ji.Id,
+			Sha:       ji.Sha,
+			Message:   ji.Message,
 		})
 	}
 

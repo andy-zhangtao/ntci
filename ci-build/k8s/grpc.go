@@ -138,6 +138,8 @@ func (s *server) GetJob(ctx context.Context, in *build_rpc_v1.JobRequest) (*buil
 			Branch:    b.Branch,
 			Url:       b.Git,
 			Id:        int32(b.Id),
+			Sha:       b.Sha,
+			Message:   b.Message,
 		})
 	}
 

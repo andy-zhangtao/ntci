@@ -275,7 +275,9 @@ proto.JobDetail.toObject = function(includeInstance, msg) {
     timestamp: jspb.Message.getFieldWithDefault(msg, 3, ""),
     branch: jspb.Message.getFieldWithDefault(msg, 4, ""),
     url: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    id: jspb.Message.getFieldWithDefault(msg, 6, 0)
+    id: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    sha: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    message: jspb.Message.getFieldWithDefault(msg, 8, "")
   };
 
   if (includeInstance) {
@@ -335,6 +337,14 @@ proto.JobDetail.deserializeBinaryFromReader = function(msg, reader) {
     case 6:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setId(value);
+      break;
+    case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSha(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMessage(value);
       break;
     default:
       reader.skipField();
@@ -404,6 +414,20 @@ proto.JobDetail.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeInt32(
       6,
+      f
+    );
+  }
+  f = message.getSha();
+  if (f.length > 0) {
+    writer.writeString(
+      7,
+      f
+    );
+  }
+  f = message.getMessage();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
       f
     );
   }
@@ -515,6 +539,42 @@ proto.JobDetail.prototype.getId = function() {
  */
 proto.JobDetail.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 6, value);
+};
+
+
+/**
+ * optional string sha = 7;
+ * @return {string}
+ */
+proto.JobDetail.prototype.getSha = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.JobDetail} returns this
+ */
+proto.JobDetail.prototype.setSha = function(value) {
+  return jspb.Message.setProto3StringField(this, 7, value);
+};
+
+
+/**
+ * optional string message = 8;
+ * @return {string}
+ */
+proto.JobDetail.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.JobDetail} returns this
+ */
+proto.JobDetail.prototype.setMessage = function(value) {
+  return jspb.Message.setProto3StringField(this, 8, value);
 };
 
 
