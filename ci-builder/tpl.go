@@ -13,7 +13,7 @@ env |grep -v NTCI_BUILDER_TOKEN
 echo ""
 echo "------->Before Build"
 {{range .BeforeBuild}}
-echo '-------> {{.}}'
+echo '  =====> {{.}}'
 {{.}} ||true
 {{end}}
 echo ''
@@ -21,14 +21,14 @@ echo ''
 echo "------->Build"
 set -e
 {{range .Build}}
-echo '-------> {{.}}'
+echo '  =====> {{.}}'
 {{.}} 2>&1
 {{end}}
 echo ''
 
 echo "------->After Build"
 {{range .AfterBuild}}
-echo '-------> {{.}}'
+echo '  =====> {{.}}'
 {{.}} ||true
 {{end}}
 echo ''
