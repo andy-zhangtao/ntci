@@ -7,7 +7,7 @@ CREATE TABLE "ntci"."build" (
   "id" int4 NOT NULL,
   "branch" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "git" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "timestamp" date NOT NULL,
+  "timestamp" timestamp(0) NOT NULL,
   "status" int4 NOT NULL DEFAULT 0,
   "owner" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "sha" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,

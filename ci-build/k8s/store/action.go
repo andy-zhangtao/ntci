@@ -12,14 +12,14 @@ func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 	var rows *_sql.Rows
 
 	if name == "" {
-		sql = "SELECT * FROM build where owner=$1 order by timestamp desc"
+		sql = "SELECT * FROM build where owner=$1 order by timestamp desc  LIMIT 30"
 		logrus.Debugf("Select SQL: %s . $1= %s", sql, user)
 		rows, err = p.db.Query(sql, user)
 		if err != nil {
 			return
 		}
 	} else {
-		sql = "SELECT * FROM build where owner=$1 AND name=$2 order by timestamp desc"
+		sql = "SELECT * FROM build where owner=$1 AND name=$2 order by timestamp desc LIMIT 30"
 		logrus.Debugf("Select SQL: %s . $1= %s . $2= %s", sql, user, name)
 		rows, err = p.db.Query(sql, user, name)
 		if err != nil {
