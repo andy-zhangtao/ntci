@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -97,14 +96,14 @@ So use split web url, and return the first element.
 
 */
 func drawOffUrl(p pushEvent) string {
-	end := ""
-	if p.Project.Namespace != "" {
-		end = fmt.Sprintf("%s/%s", p.Project.Namespace, p.Project.Name)
-	} else {
-		end = fmt.Sprintf("%s", p.Project.Name)
-	}
+	//end := ""
+	//if p.Project.Namespace != "" {
+	//	end = fmt.Sprintf("%s/%s", p.Project.Namespace, p.Project.Name)
+	//} else {
+	//	end = fmt.Sprintf("%s", p.Project.Name)
+	//}
 
-	s := strings.Split(p.Project.WebURL, end)
+	s := strings.Split(p.Project.WebURL, p.Project.PathWithNamespace)
 
 	return s[0]
 }
