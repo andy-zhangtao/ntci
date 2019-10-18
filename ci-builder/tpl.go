@@ -14,7 +14,7 @@ echo ""
 echo "------->Before Build"
 {{range .BeforeBuild}}
 echo '  =====> {{.}}'
-{{.}} ||true
+{{.}} 2>&1 ||true
 {{end}}
 echo ''
 
@@ -29,7 +29,7 @@ echo ''
 echo "------->After Build"
 {{range .AfterBuild}}
 echo '  =====> {{.}}'
-{{.}} ||true
+{{.}} 2>&1 ||true
 {{end}}
 echo ''
 `
