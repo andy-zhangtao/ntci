@@ -143,10 +143,23 @@ func run() (err error) {
 	updateJobStatus(NtciParseSuccess)
 	logrus.Info(".ntci.yml")
 	logrus.Infof("  language: %s", nt.Language)
-	logrus.Infof("  env: %s", nt.Env)
-	logrus.Infof("  build: %s", nt.Build)
-	logrus.Infof("  before build: %s", nt.BeforeBuild)
-	logrus.Infof("  after build: %s", nt.AfterBuild)
+	logrus.Info("  env:")
+	for _, e := range nt.Env {
+		logrus.Infof("    %s", e)
+	}
+	logrus.Info("  before build:")
+	for _, b := range nt.BeforeBuild {
+		logrus.Infof("    %s", b)
+	}
+	logrus.Info("  build:")
+	for _, b := range nt.Build {
+		logrus.Infof("    %s", b)
+	}
+
+	logrus.Info("  after build:")
+	for _, a := range nt.AfterBuild {
+		logrus.Infof("    %s", a)
+	}
 	logrus.Infof(" ")
 
 	updateJobStatus(Building)
