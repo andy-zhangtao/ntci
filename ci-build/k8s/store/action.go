@@ -116,7 +116,7 @@ Get specify build ID. If there is no build record, create a new one.
 */
 func (p *PGBus) getNextId(b Build) (id int, err error) {
 	query := "SELECT ID FROM id WHERE name=$1 AND owner=$2"
-	logrus.Debugf("GetNextID SQL: %s , name: %s", query, b.Name, b.User)
+	logrus.Debugf("GetNextID SQL: %s , name: %s, owner:%s", query, b.Name, b.User)
 	rows, err := p.db.Query(query, b.Name)
 	if err != nil {
 		return 0, err
