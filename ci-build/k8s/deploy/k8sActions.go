@@ -87,8 +87,9 @@ func NewJob(b store.Build, commenv map[string]string) (err error) {
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name:  b.Name,
-							Image: b.Image,
+							Name:            b.Name,
+							Image:           b.Image,
+							ImagePullPolicy: apiv1.PullAlways,
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NTCI_BUILDER_SHA",
