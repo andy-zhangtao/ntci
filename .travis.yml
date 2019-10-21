@@ -27,8 +27,10 @@ after_script:
   - docker build -t ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.ntci .
   - docker build -t ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.k8s-build .
   - docker build -t ${NTCI_IMG_NAME}-go:latest -f script/builder/golang/Dockerfile.latest .
+  - docker build -t ${NTCI_IMG_NAME}-node:yarn -f script/builder/node/Dockerfile.yarn .
   - docker build -t ${NTCI_IMG_DEPLOY}:systemd-latest -f Dockerfile.deploy-systemd .
   - docker push ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH}
   - docker push ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH}
   - docker push ${NTCI_IMG_NAME}-go:latest
   - docker push ${NTCI_IMG_DEPLOY}:systemd-latest
+  - docker push ${NTCI_IMG_NAME}-node:yarn

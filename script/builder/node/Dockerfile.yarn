@@ -1,0 +1,4 @@
+FROM vikings/ntci-base-node:yarn
+COPY bin/ntci-builder /ntci-builder
+ENV  NTCI_BUILDER_ROOT=/
+ENTRYPOINT ["/ntci-builder"]
