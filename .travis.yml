@@ -22,6 +22,7 @@ install:
   - CGO_ENABLED=0 go build -o bin/k8s-build-server ci-build/k8s/*.go
   - go build -o bin/ntci-builder ci-builder/*.go
   - go build -o bin/ntci-deployer-systemd ci-deployer/systemd/*.go
+  - go build -o bin/ntci-deployer-k8s ci-deployer/k8s/*.go
 
 after_script:
   - docker build -t ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.ntci .
@@ -29,8 +30,10 @@ after_script:
   - docker build -t ${NTCI_IMG_NAME}-go:latest -f script/builder/golang/Dockerfile.latest .
   - docker build -t ${NTCI_IMG_NAME}-node:yarn -f script/builder/node/Dockerfile.yarn .
   - docker build -t ${NTCI_IMG_DEPLOY}:systemd-latest -f Dockerfile.deploy-systemd .
+  - docker build -t ${NTCI_IMG_DEPLOY}:k8s-latest -f Dockerfile.deploy-k8s .
   - docker push ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH}
   - docker push ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH}
   - docker push ${NTCI_IMG_NAME}-go:latest
   - docker push ${NTCI_IMG_DEPLOY}:systemd-latest
+  - docker push ${NTCI_IMG_DEPLOY}:k8s-latest
   - docker push ${NTCI_IMG_NAME}-node:yarn
