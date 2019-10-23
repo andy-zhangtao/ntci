@@ -62,7 +62,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	commits := len(push.Commits)
 	s.id = push.ProjectID
 	s.branch = drawOffBranch(push)
-	s.name = strings.ToLower(push.Project.Name)
+	s.name = converName(strings.ToLower(push.Project.Name))
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
@@ -85,6 +85,19 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+// converName conver '_' to '-'
+func converName(name string) string {
+	idx := []string{
+		"_",
+	}
+
+	for _, i := range idx {
+		name = strings.Replace(name, i, "_", -1)
+	}
+
+	return name
 }
 
 /*
