@@ -94,7 +94,7 @@ func converName(name string) string {
 	}
 
 	for _, i := range idx {
-		name = strings.Replace(name, i, "_", -1)
+		name = strings.Replace(name, i, "-", -1)
 	}
 
 	return name
