@@ -77,6 +77,7 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 		User:      in.User,
 		Sha:       in.Sha,
 		Message:   in.Message,
+		Id:        int(in.Id),
 	}
 
 	isExist, image := fetchImage(in.Language, in.Lanversion)
@@ -90,23 +91,23 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 
 	b.Image = image
 
-	env, err := s.pg.GetCommonEnv()
-	if err != nil {
-		logrus.Error(err)
-	}
+	//env, err := s.pg.GetCommonEnv()
+	//if err != nil {
+	//	logrus.Error(err)
+	//}
+	//
+	//id, err := s.pg.AddNewBuild(b)
+	//if err != nil {
+	//	logrus.Errorf("Add Build Record Error: %s", err.Error())
+	//	return &build_rpc_v1.Reply{
+	//		Code:    -1,
+	//		Message: err.Error(),
+	//	}, nil
+	//}
 
-	id, err := s.pg.AddNewBuild(b)
-	if err != nil {
-		logrus.Errorf("Add Build Record Error: %s", err.Error())
-		return &build_rpc_v1.Reply{
-			Code:    -1,
-			Message: err.Error(),
-		}, nil
-	}
+	//b.Id = id
 
-	b.Id = id
-
-	err = deploy.NewJob(b, env)
+	err := deploy.NewJob(b, in.Env)
 	if err != nil {
 		logrus.Errorf("Create Build Job Error: %s", err.Error())
 		return &build_rpc_v1.Reply{

@@ -77,10 +77,14 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 
 	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	//defer cancel()
+	env, err := bus.Pb.GetCommonEnv()
+	if err != nil {
+		logrus.Error(err)
+	}
 
 	r, err := c.Run(context.Background(), &build_rpc_v1.Request{
 		Name:       s.name,
-		Id:         s.commit,
+		Id:         int32(s.jid),
 		Branch:     s.branch,
 		Url:        s.webURL,
 		Language:   s.language,
@@ -88,6 +92,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		User:       s.user,
 		Sha:        s.sha,
 		Message:    s.message,
+		Env:        env,
 	})
 
 	if err != nil {

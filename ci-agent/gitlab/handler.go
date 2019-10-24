@@ -101,6 +101,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.jid = id
+
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)
 
