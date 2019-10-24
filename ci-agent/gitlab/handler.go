@@ -88,7 +88,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		Branch:    s.branch,
 		Status:    store.BuildReady,
 		Git:       s.url,
-		Timestamp: time.Time{},
+		Timestamp: time.Now().Local(),
 		User:      s.user,
 		Sha:       s.sha,
 		Message:   s.message,
