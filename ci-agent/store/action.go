@@ -2,7 +2,6 @@ package store
 
 import (
 	_sql "database/sql"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 )
@@ -97,12 +96,12 @@ Update specify job status.
 // 4 - Build success
 //-4 - Build failed
 */
-func (p *PGBus) UpdataBuildStatus(status int32, name, id, user string) (err error) {
+func (p *PGBus) UpdataBuildStatus(status int32, id int, name, user string) (err error) {
 
-	i, _ := strconv.Atoi(id)
+	//i, _ := strconv.Atoi(id)
 	b := Build{
 		Name: name,
-		Id:   i,
+		Id:   id,
 		User: user,
 	}
 

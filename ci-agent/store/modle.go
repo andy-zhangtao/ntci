@@ -17,7 +17,8 @@ type Build struct {
 	Message   string
 }
 
-
-const(
+const (
 	BuildReady = iota
+	BuildFailed
+	BuildIng
 )
