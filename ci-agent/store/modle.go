@@ -18,7 +18,8 @@ type Build struct {
 }
 
 const (
-	BuildReady = iota
-	BuildFailed
-	BuildIng
+	BuildReady  = 0
+	BuildFailed = -2
+	BuildEnv    = 2
+	Building    = 3
 )

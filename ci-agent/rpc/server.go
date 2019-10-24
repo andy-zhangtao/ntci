@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -16,31 +17,29 @@ type gateway struct {
 	buildAddr string
 }
 
+func (g *gateway) JobStatus(ctx context.Context, in *gateway_rpc_v1.Builder) (*gateway_rpc_v1.Reply, error) {
+	bus := dataBus.GetBus()
+	id, _ := strconv.Atoi(in.Jid)
+
+	err := bus.Pb.UpdataBuildStatus(in.Status, id, in.Jname, in.User)
+
+	if err != nil {
+		return &gateway_rpc_v1.Reply{
+			Code:    -1,
+			Message: err.Error(),
+		}, nil
+	}
+
+	return &gateway_rpc_v1.Reply{
+		Code:    0,
+		Message: "OK",
+	}, nil
+}
+
 func (g *gateway) GetBuild(ctx context.Context, in *gateway_rpc_v1.BuildRequest) (*gateway_rpc_v1.JobInfo, error) {
-	//conn, err := grpc.Dial(g.buildAddr, grpc.WithInsecure())
-	//if err != nil {
-	//	logrus.Errorf("did not connect: %v", err)
-	//	return nil, err
-	//}
-	//defer conn.Close()
-	//
-	//c := build_rpc_v1.NewBuildServiceClient(conn)
-	//
-	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	//defer cancel()
-	//
-	//j, err := c.GetJob(ctx, &build_rpc_v1.JobRequest{
-	//	Owner: in.User,
-	//	Name:  in.Name,
-	//})
-	//
-	//if err != nil {
-	//	logrus.Errorf("Fetch Build Error: %v", err)
-	//	return nil, errors.New(fmt.Sprintf("Fetch Build Error: %v", err))
-	//}
-	//
+
 	result := new(gateway_rpc_v1.JobInfo)
-	//result.Count = j.Count
+
 	bus := dataBus.GetBus()
 	bs, err := bus.Pb.GetBuild(in.User, in.Name)
 	if err != nil {
