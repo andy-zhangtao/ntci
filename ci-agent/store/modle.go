@@ -18,8 +18,9 @@ type Build struct {
 }
 
 const (
-	BuildReady  = 0
-	BuildFailed = -2
-	BuildEnv    = 2
-	Building    = 3
+	BuildReady = 0
+	BuildEnv     = 2
+	Building     = 3
+	BuildSuccess = 4
+	BuildFailed  = -4
 )

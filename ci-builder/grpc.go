@@ -7,7 +7,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	build_rpc_v1 "ntci/ci-grpc/build"
+	gateway_rpc_v1 "ntci/ci-grpc/gateway"
 )
 
 const (
@@ -41,12 +41,12 @@ func updateJobStatus(flag int32) (err error) {
 
 	defer conn.Close()
 
-	c := build_rpc_v1.NewBuildServiceClient(conn)
+	c := gateway_rpc_v1.NewGateWayRpcClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	r, err := c.JobStatus(ctx, &build_rpc_v1.Builder{
+	r, err := c.JobStatus(ctx, &gateway_rpc_v1.Builder{
 		Jname:  gm.Name,
 		Jid:    gm.Id,
 		Status: flag,
