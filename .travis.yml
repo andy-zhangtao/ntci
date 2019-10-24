@@ -6,7 +6,7 @@ go:
 env:
   global:
     - GO111MODULE=on
-    - NTCI_VERSION=v0.1.0
+    - NTCI_VERSION=v0.2.0
     - NTCI_IMG_NAME=vikings/ntci
     - NTCI_IMG_K8S=vikings/k8s-build
     - NTCI_IMG_DEPLOY=vikings/ntci-deployer
