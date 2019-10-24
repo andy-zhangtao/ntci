@@ -5,9 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
+	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
+	"ntci/ci-agent/store"
 )
 
 /**
@@ -74,6 +77,19 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	s.sha = push.CheckoutSha[:12]
 	s.message = push.Commits[commits-1].Message
+
+	bus := dataBus.GetBus()
+
+	bus.Pb.AddNewBuild(store.Build{
+		Name:      s.name,
+		Branch:    s.branch,
+		Status:    store.BuildReady,
+		Git:       s.url,
+		Timestamp: time.Time{},
+		User:      s.user,
+		Sha:       s.sha,
+		Message:   s.message,
+	})
 
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)
