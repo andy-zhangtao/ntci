@@ -13,6 +13,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
+	"ntci/ci-agent/store"
 	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
@@ -76,10 +77,14 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 
 	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	//defer cancel()
+	env, err := bus.Pb.GetCommonEnv()
+	if err != nil {
+		logrus.Error(err)
+	}
 
 	r, err := c.Run(context.Background(), &build_rpc_v1.Request{
 		Name:       s.name,
-		Id:         s.commit,
+		Id:         int32(s.jid),
 		Branch:     s.branch,
 		Url:        s.webURL,
 		Language:   s.language,
@@ -87,18 +92,22 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		User:       s.user,
 		Sha:        s.sha,
 		Message:    s.message,
+		Env:        env,
 	})
 
 	if err != nil {
+		bus.Pb.UpdataBuildStatus(int32(store.BuildFailed), s.jid, s.name, s.user)
 		logrus.Errorf("Invoke Build Service Error.  %v", err)
 		return err
 	}
 
 	if r.Code != GRPC_SUCC {
+		bus.Pb.UpdataBuildStatus(int32(store.BuildFailed), s.jid, s.name, s.user)
 		logrus.Errorf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message)
 		return errors.New("Invoke Build Service Failed ")
 	}
 
+	bus.Pb.UpdataBuildStatus(int32(store.BuildIng), s.jid, s.name, s.user)
 	logrus.Infof("Invoke Build Service Success: %d", r.Code)
 	return
 }

@@ -5,9 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
+	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
+	"ntci/ci-agent/store"
 )
 
 /**
@@ -18,9 +21,12 @@ id is this repository id.
 branch is trigger branch name.
 */
 type Service struct {
-	url        string
-	webURL     string
-	id         int
+	url    string
+	webURL string
+	// id : project id
+	id int
+	// jid : db idx
+	jid        int
 	branch     string
 	name       string
 	commit     string
@@ -74,6 +80,27 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	s.sha = push.CheckoutSha[:12]
 	s.message = push.Commits[commits-1].Message
+
+	bus := dataBus.GetBus()
+
+	id, err := bus.Pb.AddNewBuild(store.Build{
+		Name:      s.name,
+		Branch:    s.branch,
+		Status:    store.BuildReady,
+		Git:       s.url,
+		Timestamp: time.Time{},
+		User:      s.user,
+		Sha:       s.sha,
+		Message:   s.message,
+	})
+	if err != nil {
+		logrus.Errorf("Add New Build Error. %s ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	s.jid = id
 
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)

@@ -12,7 +12,7 @@ message Request {
     // repository url
     string url = 3;
     // commit id
-    string id = 4;
+    int32 id = 4;
     // build language
     string language = 5;
     // default is "latest"
@@ -25,6 +25,8 @@ message Request {
     string sha = 9;
     // the latest commit message
     string message = 10;
+    // build env
+    map<string, string> env = 11;
 }
 
 message Reply {

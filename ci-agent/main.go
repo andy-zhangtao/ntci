@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -28,16 +27,6 @@ func main() {
 }
 
 func init() {
-	p, err := strconv.Atoi(os.Getenv("CI_WEB_PORT"))
-	if err == nil {
-		port = p
-	}
-
-	p, err = strconv.Atoi(os.Getenv("CI_GATEWAY_PORT"))
-	if err == nil {
-		gatewayPort = p
-	}
-
 	switch strings.ToLower(os.Getenv("CI_WEB_LOG_LEVEL")) {
 	case "info":
 		logrus.SetLevel(logrus.InfoLevel)
@@ -53,9 +42,19 @@ func init() {
 		busFile = os.Getenv("CI_WEB_CONFIGURE")
 	}
 
-	err = dataBus.InitDataBus(busFile)
+	err := dataBus.InitDataBus(busFile)
 	if err != nil {
 		logrus.Errorf("Parse Configure Error: %s", err.Error())
 		os.Exit(-1)
 	}
+
+	bus := dataBus.GetBus()
+	if bus.WebPort > 0 {
+		port = bus.WebPort
+	}
+
+	if bus.GateWayPort > 0 {
+		gatewayPort = bus.GateWayPort
+	}
+
 }
