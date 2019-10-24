@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -75,10 +74,10 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 
 	c := build_rpc_v1.NewBuildServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//defer cancel()
 
-	r, err := c.Run(ctx, &build_rpc_v1.Request{
+	r, err := c.Run(context.Background(), &build_rpc_v1.Request{
 		Name:       s.name,
 		Id:         s.commit,
 		Branch:     s.branch,
