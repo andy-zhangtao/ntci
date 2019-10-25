@@ -105,4 +105,8 @@ service BuildService {
 
     rpc GetJobLog (Job) returns (stream Log) {
     }
+
+    rpc RestartJob (Request) returns (Reply) {
+
+    }
 }

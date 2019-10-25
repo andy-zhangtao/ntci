@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/batch/v1"
@@ -57,7 +59,24 @@ func DeleteJob(b store.Build) (err error) {
 	job := fmt.Sprintf("%s-%d", b.Name, b.Id)
 	logrus.Infof("Remove Job: %s", job)
 
-	return kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{})
+	if err = kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{}); err != nil {
+		return
+	}
+
+	for {
+		j, err := kc.client.BatchV1().Jobs(kc.namespace).Get(job, metav1.GetOptions{})
+		if err == nil && j.Name != "" {
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		if err != nil && strings.Contains(err.Error(), "not found") {
+			return
+		}
+
+		return err
+	}
+
 }
 
 // NewJob
@@ -65,13 +84,6 @@ func DeleteJob(b store.Build) (err error) {
 func NewJob(b store.Build, commenv map[string]string) (err error) {
 
 	// Clear build job after 10mins.
-	// Try clean job before create
-
-	err = DeleteJob(b)
-	if err != nil {
-		logrus.Errorf("Delete Error: %s . Maybe is normal", err.Error())
-	}
-
 	ttl := int32(60 * 10)
 	bf := int32(1)
 

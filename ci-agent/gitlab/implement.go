@@ -77,7 +77,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		logrus.Error(err)
 	}
 
-	r, err := builder.InvokeBuilderService(&build_rpc_v1.Request{
+	r, err := builder.InvokeBuilderServiceRun(&build_rpc_v1.Request{
 		Name:       s.name,
 		Id:         int32(s.jid),
 		Branch:     s.branch,

@@ -10,7 +10,7 @@ import (
 	build_rpc_v1 "ntci/ci-grpc/build"
 )
 
-func InvokeBuilderService(req *build_rpc_v1.Request) (res *build_rpc_v1.Reply, err error) {
+func InvokeBuilderServiceRun(req *build_rpc_v1.Request) (res *build_rpc_v1.Reply, err error) {
 	bus := dataBus.GetBus()
 
 	conn, err := grpc.Dial(bus.Build[bus.BuildMode].Addr, grpc.WithInsecure())
@@ -24,4 +24,19 @@ func InvokeBuilderService(req *build_rpc_v1.Request) (res *build_rpc_v1.Reply, e
 
 	return c.Run(context.Background(), req)
 
+}
+
+func InvokeBuilderServiceRestart(req *build_rpc_v1.Request) (res *build_rpc_v1.Reply, err error) {
+	bus := dataBus.GetBus()
+
+	conn, err := grpc.Dial(bus.Build[bus.BuildMode].Addr, grpc.WithInsecure())
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("did not connect: %v", err))
+	}
+
+	defer conn.Close()
+
+	c := build_rpc_v1.NewBuildServiceClient(conn)
+
+	return c.RestartJob(context.Background(), req)
 }
