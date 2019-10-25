@@ -69,7 +69,7 @@ func NewJob(b store.Build, commenv map[string]string) (err error) {
 
 	err = DeleteJob(b)
 	if err != nil {
-		logrus.Errorf("Delete Error: %s . Maybe is normal")
+		logrus.Errorf("Delete Error: %s . Maybe is normal", err.Error())
 	}
 
 	ttl := int32(60 * 10)
