@@ -66,7 +66,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 	bus := dataBus.GetBus()
 
 	if s.language != "" {
-		err = bus.Pb.UpdateBuildLanguage(s.language, s.lanversion, s.id, s.language, s.lanversion)
+		err = bus.Pb.UpdateBuildLanguage(s.language, s.lanversion, s.jid, s.language, s.lanversion)
 		if err != nil {
 			return
 		}
