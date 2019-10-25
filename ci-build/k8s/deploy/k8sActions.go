@@ -215,7 +215,7 @@ func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJob
 		n, err := podLogs.Read(data)
 		//logrus.Errorf("%d, err: %v", n, err)
 		if err != nil {
-			fmt.Print(string(data[:n]))
+			//fmt.Print(string(data[:n]))
 			return ls.Send(&build_rpc_v1.Log{
 				Message: string(data[:n]),
 			})
@@ -244,10 +244,11 @@ func getPodOfJob(jobname string) (podname string, err error) {
 		return
 	}
 
-	if len(p.Items) == 0 {
+	l := len(p.Items)
+	if l == 0 {
 		err = errors.New("Can not find the pod of this job. ")
 		return
 	}
 
-	return p.Items[0].Name, nil
+	return p.Items[l-1].Name, nil
 }
