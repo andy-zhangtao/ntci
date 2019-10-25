@@ -118,6 +118,7 @@ func (g *gateway) GetBuild(ctx context.Context, in *gateway_rpc_v1.BuildRequest)
 			Id:        int32(ji.Id),
 			Sha:       ji.Sha,
 			Message:   ji.Message,
+			Namespace: ji.Namespace,
 		})
 	}
 

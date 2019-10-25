@@ -19,6 +19,7 @@ message JobDetail {
     int32 id = 6;
     string sha = 7;
     string message = 8;
+    string namespace = 9;
 }
 
 message JobInfo {

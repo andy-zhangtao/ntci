@@ -187,7 +187,7 @@ func (p *PGBus) updateBuild(status int32, b Build) error {
 
 func (p *PGBus) updateLanguage(lan, lanv string, b Build) error {
 	sql := "UPDATE build SET language=$1, langver=$2 WHERE name=$3 and id=$4 and owner=$5"
-	logrus.Infof("UPDATE Build Language SQL: %s ", sql)
+	logrus.Infof("UPDATE Build Language SQL: %s . $1=%s $2=%s $3=%s $4=%d $5=%s", sql, lan, lanv, b.Name, b.Id, b.User)
 	_, err := p.db.Exec(sql, lan, lanv, b.Name, b.Id, b.User)
 	return err
 }

@@ -321,7 +321,8 @@ proto.JobDetail.toObject = function(includeInstance, msg) {
     url: jspb.Message.getFieldWithDefault(msg, 5, ""),
     id: jspb.Message.getFieldWithDefault(msg, 6, 0),
     sha: jspb.Message.getFieldWithDefault(msg, 7, ""),
-    message: jspb.Message.getFieldWithDefault(msg, 8, "")
+    message: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    namespace: jspb.Message.getFieldWithDefault(msg, 9, "")
   };
 
   if (includeInstance) {
@@ -389,6 +390,10 @@ proto.JobDetail.deserializeBinaryFromReader = function(msg, reader) {
     case 8:
       var value = /** @type {string} */ (reader.readString());
       msg.setMessage(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setNamespace(value);
       break;
     default:
       reader.skipField();
@@ -472,6 +477,13 @@ proto.JobDetail.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       8,
+      f
+    );
+  }
+  f = message.getNamespace();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
       f
     );
   }
@@ -619,6 +631,24 @@ proto.JobDetail.prototype.getMessage = function() {
  */
 proto.JobDetail.prototype.setMessage = function(value) {
   return jspb.Message.setProto3StringField(this, 8, value);
+};
+
+
+/**
+ * optional string namespace = 9;
+ * @return {string}
+ */
+proto.JobDetail.prototype.getNamespace = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.JobDetail} returns this
+ */
+proto.JobDetail.prototype.setNamespace = function(value) {
+  return jspb.Message.setProto3StringField(this, 9, value);
 };
 
 
