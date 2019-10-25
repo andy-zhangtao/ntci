@@ -48,11 +48,16 @@ message Reply {
 
 
 service GateWayRpc {
-    //    GetBuild Query User's All Builds
+    // GetBuild Query User's All Builds
     rpc GetBuild (BuildRequest) returns (JobInfo) {
     }
 
     // Builder update status via this rpc.
     rpc JobStatus (Builder) returns (Reply) {
+    }
+
+    // Restart Specify Job
+    rpc RestartJob (Builder) returns (Reply) {
+
     }
 }

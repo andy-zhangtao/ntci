@@ -2,6 +2,7 @@ package store
 
 import (
 	_sql "database/sql"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -25,6 +26,28 @@ func (p *PGBus) GetCommonEnv() (env map[string]string, err error) {
 		} else {
 			env[key] = value
 		}
+	}
+
+	return
+}
+func (p *PGBus) GetBuildByID(user, name string, id int) (b Build, err error) {
+	sql := "SELECT * FROM build WHERE owner=$1 AND name=$2 AND id=$3"
+	logrus.Debugf("Select SQL: %s . $1=%s $2=$s $3=%d ", sql, user, name, id)
+	var rows *_sql.Rows
+
+	rows, err = p.db.Query(sql, user, name, id)
+	if err != nil {
+		return
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message)
+		if err != nil {
+			return
+		}
+
+	} else {
+		return b, errors.New("Not Found This Build ")
 	}
 
 	return
@@ -81,6 +104,18 @@ func (p *PGBus) AddNewBuild(b Build) (id int, err error) {
 
 	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp, b.User, b.Sha, b.Message)
 	return id, err
+}
+
+// UpdateBuildLanguage
+// Language can not empty. Lan version default is latest
+func (p *PGBus) UpdateBuildLanguage(language, lanver string, id int, name, user string) (err error) {
+	b := Build{
+		Name: name,
+		Id:   id,
+		User: user,
+	}
+
+	return p.updateLanguage(language, lanver, b)
 }
 
 /*
@@ -147,5 +182,12 @@ func (p *PGBus) updateBuild(status int32, b Build) error {
 	sql := "UPDATE build SET status=$1 WHERE name=$2 and id=$3 and owner=$4"
 	logrus.Debugf("UPDATE Build Status SQL: %s ", sql)
 	_, err := p.db.Exec(sql, status, b.Name, b.Id, b.User)
+	return err
+}
+
+func (p *PGBus) updateLanguage(lan, lanv string, b Build) error {
+	sql := "UPDATE build SET language=$1, langver=$2 WHERE name=$3 and id=$4 and owner=$5"
+	logrus.Debugf("UPDATE Build Language SQL: %s ", sql)
+	_, err := p.db.Exec(sql, lan, lanv, b.Name, b.Id, b.User)
 	return err
 }

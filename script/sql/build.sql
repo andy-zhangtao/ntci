@@ -11,7 +11,9 @@ CREATE TABLE "ntci"."build" (
   "status" int4 NOT NULL DEFAULT 0,
   "owner" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "sha" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "message" varchar(255) COLLATE "pg_catalog"."default"
+  "message" varchar(255) COLLATE "pg_catalog"."default",
+  "language" varchar(255) COLLATE "pg_catalog"."default",
+  "langver" varchar(255) COLLATE "pg_catalog"."default"
 )
 ;
 ALTER TABLE "ntci"."build" OWNER TO "ntci";

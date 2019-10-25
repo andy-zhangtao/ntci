@@ -1,7 +1,6 @@
 package gitlab
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -9,10 +8,10 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"gopkg.in/yaml.v2"
 	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
+	"ntci/ci-agent/rpc/builder"
 	"ntci/ci-agent/store"
 	build_rpc_v1 "ntci/ci-grpc/build"
 )
@@ -66,23 +65,19 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 
 	bus := dataBus.GetBus()
 
-	conn, err := grpc.Dial(bus.Build[bus.BuildMode].Addr, grpc.WithInsecure())
-	if err != nil {
-		logrus.Errorf("did not connect: %v", err)
-		return err
+	if s.language != "" {
+		err = bus.Pb.UpdateBuildLanguage(s.language, s.lanversion, s.id, s.language, s.lanversion)
+		if err != nil {
+			return
+		}
 	}
-	defer conn.Close()
 
-	c := build_rpc_v1.NewBuildServiceClient(conn)
-
-	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	//defer cancel()
 	env, err := bus.Pb.GetCommonEnv()
 	if err != nil {
 		logrus.Error(err)
 	}
 
-	r, err := c.Run(context.Background(), &build_rpc_v1.Request{
+	r, err := builder.InvokeBuilderService(&build_rpc_v1.Request{
 		Name:       s.name,
 		Id:         int32(s.jid),
 		Branch:     s.branch,
@@ -94,6 +89,35 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		Message:    s.message,
 		Env:        env,
 	})
+
+	//conn, err := grpc.Dial(bus.Build[bus.BuildMode].Addr, grpc.WithInsecure())
+	//if err != nil {
+	//	logrus.Errorf("did not connect: %v", err)
+	//	return err
+	//}
+	//defer conn.Close()
+	//
+	//c := build_rpc_v1.NewBuildServiceClient(conn)
+	//
+	////ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	////defer cancel()
+	//env, err := bus.Pb.GetCommonEnv()
+	//if err != nil {
+	//	logrus.Error(err)
+	//}
+
+	//r, err := c.Run(context.Background(), &build_rpc_v1.Request{
+	//	Name:       s.name,
+	//	Id:         int32(s.jid),
+	//	Branch:     s.branch,
+	//	Url:        s.webURL,
+	//	Language:   s.language,
+	//	Lanversion: s.lanversion,
+	//	User:       s.user,
+	//	Sha:        s.sha,
+	//	Message:    s.message,
+	//	Env:        env,
+	//})
 
 	if err != nil {
 		bus.Pb.UpdataBuildStatus(int32(store.BuildFailed), s.jid, s.name, s.user)

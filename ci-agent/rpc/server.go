@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -10,11 +11,71 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"ntci/ci-agent/dataBus"
+	"ntci/ci-agent/rpc/builder"
+	"ntci/ci-agent/store"
+	build_rpc_v1 "ntci/ci-grpc/build"
 	gateway_rpc_v1 "ntci/ci-grpc/gateway"
 )
 
 type gateway struct {
 	buildAddr string
+}
+
+func (g *gateway) RestartJob(ctx context.Context, in *gateway_rpc_v1.Builder) (*gateway_rpc_v1.Reply, error) {
+	bus := dataBus.GetBus()
+
+	id, _ := strconv.Atoi(in.Jid)
+
+	build, err := bus.Pb.GetBuildByID(in.User, in.Jname, id)
+	if err != nil {
+		return &gateway_rpc_v1.Reply{
+			Code:    -1,
+			Message: err.Error(),
+		}, err
+	}
+
+	env, err := bus.Pb.GetCommonEnv()
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	r, err := builder.InvokeBuilderService(&build_rpc_v1.Request{
+		Name:       build.Name,
+		Branch:     build.Branch,
+		Url:        build.Git,
+		Id:         int32(build.Id),
+		Language:   build.Language,
+		Lanversion: build.Lanversion,
+		User:       build.User,
+		Sha:        build.Sha,
+		Message:    build.Message,
+		Env:        env,
+	})
+
+	if err != nil {
+		bus.Pb.UpdataBuildStatus(int32(store.BuildFailed), build.Id, build.Name, build.User)
+		logrus.Errorf("Invoke Build Service Error.  %v", err)
+		return &gateway_rpc_v1.Reply{
+			Code:    -1,
+			Message: err.Error(),
+		}, err
+	}
+
+	if r.Code != 0 {
+		bus.Pb.UpdataBuildStatus(int32(store.BuildFailed), build.Id, build.Name, build.User)
+		logrus.Errorf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message)
+		return &gateway_rpc_v1.Reply{
+			Code:    -1,
+			Message: fmt.Sprintf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message),
+		}, errors.New(fmt.Sprintf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message))
+	}
+
+	bus.Pb.UpdataBuildStatus(int32(store.BuildEnv), build.Id, build.Name, build.User)
+
+	return &gateway_rpc_v1.Reply{
+		Code:    0,
+		Message: "OK",
+	}, nil
 }
 
 func (g *gateway) JobStatus(ctx context.Context, in *gateway_rpc_v1.Builder) (*gateway_rpc_v1.Reply, error) {
