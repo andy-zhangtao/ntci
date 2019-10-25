@@ -58,8 +58,12 @@ func InitK8sClient(bus *dataBus.DataBus) (err error) {
 func DeleteJob(b store.Build) (err error) {
 	job := fmt.Sprintf("%s-%d", b.Name, b.Id)
 	logrus.Infof("Remove Job: %s", job)
+	_deletePropagationForeground := metav1.DeletePropagationForeground
 
-	err = kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{});
+	err = kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{
+		PropagationPolicy: &_deletePropagationForeground,
+	})
+
 	if err != nil && strings.Contains(err.Error(), "not found") {
 		return nil
 	}
