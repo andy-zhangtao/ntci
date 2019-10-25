@@ -195,7 +195,7 @@ func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJob
 		return
 	}
 
-	logrus.Debugf("Find pod %s of job %s", pod, jobname)
+	logrus.Infof("Find pod %s of job %s", pod, jobname)
 
 	line := int64(1000)
 	req := kc.client.CoreV1().Pods(kc.namespace).GetLogs(pod, &apiv1.PodLogOptions{
@@ -213,7 +213,7 @@ func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJob
 	for {
 		data := make([]byte, 1024)
 		n, err := podLogs.Read(data)
-		logrus.Errorf("%d, err: %v", n, err)
+		//logrus.Errorf("%d, err: %v", n, err)
 		if err != nil {
 			fmt.Print(string(data[:n]))
 			return ls.Send(&build_rpc_v1.Log{
@@ -221,7 +221,7 @@ func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJob
 			})
 		}
 
-		fmt.Print(string(data[:n]))
+		//fmt.Print(string(data[:n]))
 		if ls.Send(&build_rpc_v1.Log{
 			Message: string(data[:n]),
 		}) != nil {
