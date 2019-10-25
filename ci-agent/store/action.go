@@ -32,7 +32,7 @@ func (p *PGBus) GetCommonEnv() (env map[string]string, err error) {
 }
 func (p *PGBus) GetBuildByID(user, name string, id int) (b Build, err error) {
 	sql := "SELECT * FROM build WHERE owner=$1 AND name=$2 AND id=$3"
-	logrus.Debugf("Select SQL: %s . $1=%s $2=$s $3=%d ", sql, user, name, id)
+	logrus.Debugf("Select SQL: %s . $1=%s $2=%s $3=%d ", sql, user, name, id)
 	var rows *_sql.Rows
 
 	rows, err = p.db.Query(sql, user, name, id)
@@ -41,7 +41,7 @@ func (p *PGBus) GetBuildByID(user, name string, id int) (b Build, err error) {
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message)
+		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message, &b.Language, &b.Lanversion)
 		if err != nil {
 			return
 		}
