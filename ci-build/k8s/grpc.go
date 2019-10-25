@@ -19,6 +19,57 @@ type server struct {
 	pg *store.PGBus
 }
 
+func (s *server) RestartJob(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.Reply, error) {
+	logrus.Debugf("Receive Restart Request. User: %s Name: %s Branch: %s Git: %s ID: %d Language: %s Ver: %s. Sha: %s Message: %s ", in.User, in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion, in.Sha, in.Message)
+
+	b := store.Build{
+		Name:      in.Name,
+		Branch:    in.Branch,
+		Git:       in.Url,
+		Timestamp: time.Now().Local(),
+		Token:     bus.Token,
+		Addr:      bus.Addr,
+		User:      in.User,
+		Sha:       in.Sha,
+		Message:   in.Message,
+		Id:        int(in.Id),
+	}
+
+	isExist, image := fetchImage(in.Language, in.Lanversion)
+	if !isExist {
+		logrus.Errorf("Can not support this language: %s %s", in.Language, in.Lanversion)
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: fmt.Sprintf("Can not support this language: %s %s", in.Language, in.Lanversion),
+		}, nil
+	}
+
+	b.Image = image
+
+	err := deploy.DeleteJob(b)
+	if err != nil {
+		logrus.Errorf("Delete Job Error: %s", err.Error())
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: fmt.Sprintf("Delete Job Error: %s", err.Error()),
+		}, nil
+	}
+
+	err = deploy.NewJob(b, in.Env)
+	if err != nil {
+		logrus.Errorf("Create Build Job Error: %s", err.Error())
+		return &build_rpc_v1.Reply{
+			Code:    -1,
+			Message: err.Error(),
+		}, nil
+	}
+	
+	return &build_rpc_v1.Reply{
+		Code:    0,
+		Message: "OK",
+	}, nil
+}
+
 /*
 fetch Image.
 
@@ -65,7 +116,7 @@ Run() will store build info into db.
 */
 func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_v1.Reply, error) {
 
-	logrus.Debugf("Receive Build Request. User: %s Name: %s Branch: %s Git: %s ID: %s Language: %s Ver: %s. Sha: %s Message: %s ", in.User, in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion, in.Sha, in.Message)
+	logrus.Debugf("Receive Build Request. User: %s Name: %s Branch: %s Git: %s ID: %d Language: %s Ver: %s. Sha: %s Message: %s ", in.User, in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion, in.Sha, in.Message)
 
 	b := store.Build{
 		Name:      in.Name,
@@ -77,6 +128,7 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 		User:      in.User,
 		Sha:       in.Sha,
 		Message:   in.Message,
+		Id:        int(in.Id),
 	}
 
 	isExist, image := fetchImage(in.Language, in.Lanversion)
@@ -90,18 +142,7 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 
 	b.Image = image
 
-	id, err := s.pg.AddNewBuild(b)
-	if err != nil {
-		logrus.Errorf("Add Build Record Error: %s", err.Error())
-		return &build_rpc_v1.Reply{
-			Code:    -1,
-			Message: err.Error(),
-		}, nil
-	}
-
-	b.Id = id
-
-	err = deploy.NewJob(b)
+	err := deploy.NewJob(b, in.Env)
 	if err != nil {
 		logrus.Errorf("Create Build Job Error: %s", err.Error())
 		return &build_rpc_v1.Reply{

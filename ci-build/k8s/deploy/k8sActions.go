@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/batch/v1"
@@ -53,11 +55,51 @@ func InitK8sClient(bus *dataBus.DataBus) (err error) {
 	return
 }
 
-func NewJob(b store.Build) (err error) {
+func DeleteJob(b store.Build) (err error) {
+	job := fmt.Sprintf("%s-%d", b.Name, b.Id)
+	logrus.Infof("Remove Job: %s", job)
+	_deletePropagationForeground := metav1.DeletePropagationForeground
+
+	err = kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{
+		PropagationPolicy: &_deletePropagationForeground,
+	})
+
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		return nil
+	}
+
+	for {
+		j, err := kc.client.BatchV1().Jobs(kc.namespace).Get(job, metav1.GetOptions{})
+		if err == nil && j.Name != "" {
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		if err != nil && strings.Contains(err.Error(), "not found") {
+			return nil
+		}
+
+		return err
+	}
+
+}
+
+// NewJob
+// commenv is the common environment. Every user will use it.
+func NewJob(b store.Build, commenv map[string]string) (err error) {
 
 	// Clear build job after 10mins.
 	ttl := int32(60 * 10)
 	bf := int32(1)
+
+	var ev []apiv1.EnvVar
+
+	for key, value := range commenv {
+		ev = append(ev, apiv1.EnvVar{
+			Name:  key,
+			Value: value,
+		})
+	}
 
 	job := v1.Job{
 		TypeMeta: metav1.TypeMeta{},
@@ -76,8 +118,9 @@ func NewJob(b store.Build) (err error) {
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name:  b.Name,
-							Image: b.Image,
+							Name:            b.Name,
+							Image:           b.Image,
+							ImagePullPolicy: apiv1.PullAlways,
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NTCI_BUILDER_SHA",
@@ -136,6 +179,10 @@ func NewJob(b store.Build) (err error) {
 		},
 	}
 
+	for _, e := range ev {
+		job.Spec.Template.Spec.Containers[0].Env = append(job.Spec.Template.Spec.Containers[0].Env, e)
+	}
+
 	j, err := kc.client.BatchV1().Jobs(kc.namespace).Create(&job)
 	if err != nil {
 		return err
@@ -152,7 +199,7 @@ func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJob
 		return
 	}
 
-	logrus.Debugf("Find pod %s of job %s", pod, jobname)
+	logrus.Infof("Find pod %s of job %s", pod, jobname)
 
 	line := int64(1000)
 	req := kc.client.CoreV1().Pods(kc.namespace).GetLogs(pod, &apiv1.PodLogOptions{
@@ -170,15 +217,15 @@ func GetJobLog(jobname string, flowing bool, ls build_rpc_v1.BuildService_GetJob
 	for {
 		data := make([]byte, 1024)
 		n, err := podLogs.Read(data)
-		logrus.Errorf("%d, err: %v", n, err)
+		//logrus.Errorf("%d, err: %v", n, err)
 		if err != nil {
-			fmt.Print(string(data[:n]))
+			//fmt.Print(string(data[:n]))
 			return ls.Send(&build_rpc_v1.Log{
 				Message: string(data[:n]),
 			})
 		}
 
-		fmt.Print(string(data[:n]))
+		//fmt.Print(string(data[:n]))
 		if ls.Send(&build_rpc_v1.Log{
 			Message: string(data[:n]),
 		}) != nil {
@@ -201,10 +248,11 @@ func getPodOfJob(jobname string) (podname string, err error) {
 		return
 	}
 
-	if len(p.Items) == 0 {
+	l := len(p.Items)
+	if l == 0 {
 		err = errors.New("Can not find the pod of this job. ")
 		return
 	}
 
-	return p.Items[0].Name, nil
+	return p.Items[l-1].Name, nil
 }

@@ -19,6 +19,7 @@ message JobDetail {
     int32 id = 6;
     string sha = 7;
     string message = 8;
+    string namespace = 9;
 }
 
 message JobInfo {
@@ -26,8 +27,38 @@ message JobInfo {
     repeated JobDetail jd = 2;
 }
 
+// Builder will update status via this message.
+message Builder {
+    // The build job name
+    string jname = 1;
+    // The build job id
+    string jid = 2;
+    // Job Status
+    int32 status = 3;
+    // Job Owner
+    string user = 4;
+}
+
+message Reply {
+    // 0 - success
+    // other - failed
+    int32 code = 1;
+    // Empty when success, otherwise there will be error message
+    string message = 2;
+}
+
+
 service GateWayRpc {
-    //    GetBuild Query User's All Builds
+    // GetBuild Query User's All Builds
     rpc GetBuild (BuildRequest) returns (JobInfo) {
+    }
+
+    // Builder update status via this rpc.
+    rpc JobStatus (Builder) returns (Reply) {
+    }
+
+    // Restart Specify Job
+    rpc RestartJob (Builder) returns (Reply) {
+
     }
 }

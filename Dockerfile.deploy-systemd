@@ -1,0 +1,4 @@
+FROM vikings/alpine
+ENV NTCI_DEPLOY_CONFIG=/deploy.toml
+COPY bin/ntci-deployer-systemd /ntci-deployer-systemd
+ENTRYPOINT ["/ntci-deployer-systemd"]

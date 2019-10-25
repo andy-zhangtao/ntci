@@ -4,6 +4,8 @@ go 1.13
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f
+	github.com/godbus/dbus v4.1.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.0 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/google/btree v1.0.0 // indirect
@@ -28,3 +30,5 @@ require (
 	sigs.k8s.io/yaml v1.1.0 // indirect
 
 )
+
+replace github.com/godbus/dbus v4.1.0+incompatible => github.com/godbus/dbus/v5 v5.0.3

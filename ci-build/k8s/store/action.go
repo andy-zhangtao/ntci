@@ -7,6 +7,30 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func (p *PGBus) GetCommonEnv() (env map[string]string, err error) {
+	sql := "SELECT key, value FROM priavte_data WHERE owner=$1 AND name=$2"
+	var rows *_sql.Rows
+
+	rows, err = p.db.Query(sql, "super", "super")
+	if err != nil {
+		return
+	}
+
+	env = make(map[string]string)
+
+	for rows.Next() {
+		var key, value string
+		err = rows.Scan(&key, &value)
+		if err != nil {
+			logrus.Error(err)
+		} else {
+			env[key] = value
+		}
+	}
+
+	return
+}
+
 func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 	sql := ""
 	var rows *_sql.Rows
@@ -91,9 +115,9 @@ getNextId
 Get specify build ID. If there is no build record, create a new one.
 */
 func (p *PGBus) getNextId(b Build) (id int, err error) {
-	query := "SELECT ID FROM id WHERE name=$1"
-	logrus.Debugf("GetNextID SQL: %s , name: %s", query, b.Name)
-	rows, err := p.db.Query(query, b.Name)
+	query := "SELECT ID FROM id WHERE name=$1 AND owner=$2"
+	logrus.Debugf("GetNextID SQL: %s , name: %s, owner:%s", query, b.Name, b.User)
+	rows, err := p.db.Query(query, b.Name, b.User)
 	if err != nil {
 		return 0, err
 	}
@@ -107,16 +131,16 @@ func (p *PGBus) getNextId(b Build) (id int, err error) {
 }
 
 func (p *PGBus) createNewId(b Build) error {
-	sql := "INSERT INTO id(name,id) VALUES($1,1)"
+	sql := "INSERT INTO id(owner,name,id) VALUES($1,$2,1)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
-	_, err := p.db.Exec(sql, b.Name)
+	_, err := p.db.Exec(sql, b.User, b.Name)
 	return err
 }
 
 func (p *PGBus) addBuildId(b Build) error {
-	sql := "UPDATE id set id=id+1 WHERE name=$1"
+	sql := "UPDATE id set id=id+1 WHERE name=$1 AND owner=$2"
 	logrus.Debugf("UPDATE ID SQL: %s ", sql)
-	_, err := p.db.Exec(sql, b.Name)
+	_, err := p.db.Exec(sql, b.Name, b.User)
 	return err
 }
 

@@ -9,27 +9,27 @@ echo $NTCI_BUILDER_SHA
 echo ""
 echo "------->Environment"
 echo ""
-env |grep -v NTCI_BUILDER_TOKEN
+env |grep NTCI|grep -v NTCI_BUILDER_TOKEN|grep -v PASSWD|grep -v PASSWORD|grep -v password|grep -v passwd
 echo ""
 echo "------->Before Build"
 {{range .BeforeBuild}}
-echo '-------> {{.}}'
-{{.}} ||true
+echo '  =====> {{.}}'
+{{.}} 2>&1 ||true
 {{end}}
 echo ''
 
 echo "------->Build"
 set -e
 {{range .Build}}
-echo '-------> {{.}}'
+echo '  =====> {{.}}'
 {{.}} 2>&1
 {{end}}
 echo ''
 
 echo "------->After Build"
 {{range .AfterBuild}}
-echo '-------> {{.}}'
-{{.}} ||true
+echo '  =====> {{.}}'
+{{.}} 2>&1 ||true
 {{end}}
 echo ''
 `

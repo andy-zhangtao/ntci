@@ -2,13 +2,15 @@ package gitlab
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
+	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
+	"ntci/ci-agent/store"
 )
 
 /**
@@ -19,9 +21,12 @@ id is this repository id.
 branch is trigger branch name.
 */
 type Service struct {
-	url        string
-	webURL     string
-	id         int
+	url    string
+	webURL string
+	// id : project id
+	id int
+	// jid : db idx
+	jid        int
 	branch     string
 	name       string
 	commit     string
@@ -30,6 +35,7 @@ type Service struct {
 	user       string
 	sha        string
 	message    string
+	namespace  string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +69,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	commits := len(push.Commits)
 	s.id = push.ProjectID
 	s.branch = drawOffBranch(push)
-	s.name = push.Project.Name
+	s.name = converName(strings.ToLower(push.Project.Name))
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
@@ -75,6 +81,29 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	s.sha = push.CheckoutSha[:12]
 	s.message = push.Commits[commits-1].Message
+	s.namespace = push.Project.PathWithNamespace
+
+	bus := dataBus.GetBus()
+
+	id, err := bus.Pb.AddNewBuild(store.Build{
+		Name:      s.name,
+		Branch:    s.branch,
+		Status:    store.BuildReady,
+		Git:       s.url,
+		Timestamp: time.Now().Local(),
+		User:      s.user,
+		Sha:       s.sha,
+		Message:   s.message,
+		Namespace: s.namespace,
+	})
+	if err != nil {
+		logrus.Errorf("Add New Build Error. %s ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	s.jid = id
 
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)
@@ -88,6 +117,19 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// converName conver '_' to '-'
+func converName(name string) string {
+	idx := []string{
+		"_",
+	}
+
+	for _, i := range idx {
+		name = strings.Replace(name, i, "-", -1)
+	}
+
+	return name
+}
+
 /*
 drawOffUrl
 
@@ -97,14 +139,14 @@ So use split web url, and return the first element.
 
 */
 func drawOffUrl(p pushEvent) string {
-	end := ""
-	if p.Project.Namespace != "" {
-		end = fmt.Sprintf("%s/%s", p.Project.Namespace, p.Project.Name)
-	} else {
-		end = fmt.Sprintf("%s", p.Project.Name)
-	}
+	//end := ""
+	//if p.Project.Namespace != "" {
+	//	end = fmt.Sprintf("%s/%s", p.Project.Namespace, p.Project.Name)
+	//} else {
+	//	end = fmt.Sprintf("%s", p.Project.Name)
+	//}
 
-	s := strings.Split(p.Project.WebURL, end)
+	s := strings.Split(p.Project.WebURL, p.Project.PathWithNamespace)
 
 	return s[0]
 }

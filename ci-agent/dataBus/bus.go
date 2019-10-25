@@ -5,6 +5,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/sirupsen/logrus"
+	"ntci/ci-agent/store"
 )
 
 var bus *dataBus
@@ -55,6 +56,14 @@ type dataBus struct {
 	// Build
 	// Build Sections contains all valid build service
 	Build map[string]buildService `toml:"build"`
+	// WebPort Default 8000
+	WebPort int `toml:"web_port"`
+	// GateWayPort Default 8001
+	GateWayPort int `toml:"gateway_port"`
+	// Postgres metadata
+	Postgres string `toml:"postgres"`
+
+	Pb *store.PGBus
 }
 
 type buildService struct {
@@ -81,7 +90,7 @@ func InitDataBus(file string) (err error) {
 		return
 	}
 
-	//bus.LanguageRuntime = drawOffImg(bus.Language)
+	bus.Pb = store.PG(bus.Postgres)
 
 	debug()
 	return
@@ -117,16 +126,13 @@ func GetBus() *dataBus {
 func debug() {
 	logrus.Debug("DATA-BUS")
 	logrus.Debug("*************************************")
+	logrus.Debugf("Web Server Listen: %d", bus.WebPort)
+	logrus.Debugf("Gateway Server Listen: %d", bus.GateWayPort)
+	logrus.Debugf("Postgresql Addr: %s", bus.Postgres)
+
 	if bus.Access.Gitlab.Token != "" {
 		logrus.Debugf("GitLab Token: %s", bus.Access.Gitlab.Token)
 	}
-
-	//for l, v := range bus.LanguageRuntime {
-	//	logrus.Debugf("Language: %s", l)
-	//	for tag, image := range v {
-	//		logrus.Debugf("  %s:%s", image, tag)
-	//	}
-	//}
 
 	logrus.Debugf("Build Mode: %s", bus.BuildMode)
 	for m, svc := range bus.Build {
