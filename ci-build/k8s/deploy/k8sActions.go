@@ -71,7 +71,7 @@ func DeleteJob(b store.Build) (err error) {
 		}
 
 		if err != nil && strings.Contains(err.Error(), "not found") {
-			return
+			return err
 		}
 
 		return err
