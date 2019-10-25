@@ -76,7 +76,7 @@ func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 	for rows.Next() {
 
 		b := Build{}
-		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message)
+		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message, &b.Language, &b.Lanversion)
 		if err == nil {
 			bs = append(bs, b)
 		} else {

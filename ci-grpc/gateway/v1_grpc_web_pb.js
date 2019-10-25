@@ -159,5 +159,153 @@ proto.GateWayRpcPromiseClient.prototype.getBuild =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.Builder,
+ *   !proto.Reply>}
+ */
+const methodDescriptor_GateWayRpc_JobStatus = new grpc.web.MethodDescriptor(
+  '/GateWayRpc/JobStatus',
+  grpc.web.MethodType.UNARY,
+  proto.Builder,
+  proto.Reply,
+  /** @param {!proto.Builder} request */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.Reply.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.Builder,
+ *   !proto.Reply>}
+ */
+const methodInfo_GateWayRpc_JobStatus = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.Reply,
+  /** @param {!proto.Builder} request */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.Reply.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.Builder} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.Reply)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.Reply>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.GateWayRpcClient.prototype.jobStatus =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/GateWayRpc/JobStatus',
+      request,
+      metadata || {},
+      methodDescriptor_GateWayRpc_JobStatus,
+      callback);
+};
+
+
+/**
+ * @param {!proto.Builder} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.Reply>}
+ *     A native promise that resolves to the response
+ */
+proto.GateWayRpcPromiseClient.prototype.jobStatus =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/GateWayRpc/JobStatus',
+      request,
+      metadata || {},
+      methodDescriptor_GateWayRpc_JobStatus);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.Builder,
+ *   !proto.Reply>}
+ */
+const methodDescriptor_GateWayRpc_RestartJob = new grpc.web.MethodDescriptor(
+  '/GateWayRpc/RestartJob',
+  grpc.web.MethodType.UNARY,
+  proto.Builder,
+  proto.Reply,
+  /** @param {!proto.Builder} request */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.Reply.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.Builder,
+ *   !proto.Reply>}
+ */
+const methodInfo_GateWayRpc_RestartJob = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.Reply,
+  /** @param {!proto.Builder} request */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.Reply.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.Builder} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.Reply)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.Reply>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.GateWayRpcClient.prototype.restartJob =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/GateWayRpc/RestartJob',
+      request,
+      metadata || {},
+      methodDescriptor_GateWayRpc_RestartJob,
+      callback);
+};
+
+
+/**
+ * @param {!proto.Builder} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.Reply>}
+ *     A native promise that resolves to the response
+ */
+proto.GateWayRpcPromiseClient.prototype.restartJob =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/GateWayRpc/RestartJob',
+      request,
+      metadata || {},
+      methodDescriptor_GateWayRpc_RestartJob);
+};
+
+
 module.exports = proto;
 
