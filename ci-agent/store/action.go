@@ -41,7 +41,7 @@ func (p *PGBus) GetBuildByID(user, name string, id int) (b Build, err error) {
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message, &b.Language, &b.Lanversion)
+		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message, &b.Language, &b.Lanversion, &b.Namespace)
 		if err != nil {
 			return
 		}
@@ -76,7 +76,7 @@ func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 	for rows.Next() {
 
 		b := Build{}
-		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message, &b.Language, &b.Lanversion)
+		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message, &b.Language, &b.Lanversion, &b.Namespace)
 		if err == nil {
 			bs = append(bs, b)
 		} else {
@@ -99,10 +99,10 @@ func (p *PGBus) AddNewBuild(b Build) (id int, err error) {
 		return 0, err
 	}
 
-	sql := "INSERT INTO build (name,id,branch,git,timestamp,status,owner, sha, message) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8)"
+	sql := "INSERT INTO build (name,id,branch,git,timestamp,status,owner, sha, message, namespace) VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9)"
 	logrus.Debugf("Insert New ID SQL: %s ", sql)
 
-	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp, b.User, b.Sha, b.Message)
+	_, err = p.db.Exec(sql, b.Name, id, b.Branch, b.Git, b.Timestamp, b.User, b.Sha, b.Message, b.Namespace)
 	return id, err
 }
 
@@ -187,7 +187,7 @@ func (p *PGBus) updateBuild(status int32, b Build) error {
 
 func (p *PGBus) updateLanguage(lan, lanv string, b Build) error {
 	sql := "UPDATE build SET language=$1, langver=$2 WHERE name=$3 and id=$4 and owner=$5"
-	logrus.Debugf("UPDATE Build Language SQL: %s ", sql)
+	logrus.Infof("UPDATE Build Language SQL: %s ", sql)
 	_, err := p.db.Exec(sql, lan, lanv, b.Name, b.Id, b.User)
 	return err
 }

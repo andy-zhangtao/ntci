@@ -17,6 +17,7 @@ type Build struct {
 	Message    string
 	Language   string
 	Lanversion string
+	Namespace  string
 }
 
 const (

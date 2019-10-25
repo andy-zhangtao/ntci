@@ -35,6 +35,7 @@ type Service struct {
 	user       string
 	sha        string
 	message    string
+	namespace  string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +81,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	s.sha = push.CheckoutSha[:12]
 	s.message = push.Commits[commits-1].Message
+	s.namespace = push.Project.PathWithNamespace
 
 	bus := dataBus.GetBus()
 
@@ -92,6 +94,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		User:      s.user,
 		Sha:       s.sha,
 		Message:   s.message,
+		Namespace: s.namespace,
 	})
 	if err != nil {
 		logrus.Errorf("Add New Build Error. %s ", err.Error())
