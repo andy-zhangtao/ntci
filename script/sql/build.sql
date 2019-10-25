@@ -1,3 +1,21 @@
+/*
+ Navicat PostgreSQL Data Transfer
+
+ Source Server         : ntci-ntci
+ Source Server Type    : PostgreSQL
+ Source Server Version : 90602
+ Source Host           : 192.168.2.108:5432
+ Source Catalog        : ntci
+ Source Schema         : ntci
+
+ Target Server Type    : PostgreSQL
+ Target Server Version : 90602
+ File Encoding         : 65001
+
+ Date: 25/10/2019 10:39:01
+*/
+
+
 -- ----------------------------
 -- Table structure for build
 -- ----------------------------
@@ -12,8 +30,8 @@ CREATE TABLE "ntci"."build" (
   "owner" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "sha" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "message" varchar(255) COLLATE "pg_catalog"."default",
-  "language" varchar(255) COLLATE "pg_catalog"."default",
-  "langver" varchar(255) COLLATE "pg_catalog"."default"
+  "language" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying,
+  "langver" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying
 )
 ;
 ALTER TABLE "ntci"."build" OWNER TO "ntci";

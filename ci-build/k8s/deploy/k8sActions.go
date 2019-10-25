@@ -53,11 +53,25 @@ func InitK8sClient(bus *dataBus.DataBus) (err error) {
 	return
 }
 
+func DeleteJob(b store.Build) (err error) {
+	job := fmt.Sprintf("%s-%d", b.Name, b.Id)
+	logrus.Infof("Remove Job: %s", job)
+
+	return kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{})
+}
+
 // NewJob
 // commenv is the common environment. Every user will use it.
 func NewJob(b store.Build, commenv map[string]string) (err error) {
 
 	// Clear build job after 10mins.
+	// Try clean job before create
+
+	err = DeleteJob(b)
+	if err != nil {
+		logrus.Errorf("Delete Error: %s . Maybe is normal")
+	}
+
 	ttl := int32(60 * 10)
 	bf := int32(1)
 
