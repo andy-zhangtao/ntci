@@ -59,8 +59,9 @@ func DeleteJob(b store.Build) (err error) {
 	job := fmt.Sprintf("%s-%d", b.Name, b.Id)
 	logrus.Infof("Remove Job: %s", job)
 
-	if err = kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{}); err != nil {
-		return
+	err = kc.client.BatchV1().Jobs(kc.namespace).Delete(job, &metav1.DeleteOptions{});
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		return nil
 	}
 
 	for {
@@ -71,7 +72,7 @@ func DeleteJob(b store.Build) (err error) {
 		}
 
 		if err != nil && strings.Contains(err.Error(), "not found") {
-			return err
+			return nil
 		}
 
 		return err
