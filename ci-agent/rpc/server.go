@@ -39,10 +39,11 @@ func (g *gateway) RestartJob(ctx context.Context, in *gateway_rpc_v1.Builder) (*
 		logrus.Error(err)
 	}
 
+	url := fmt.Sprintf("%s%s.git", build.Git, build.Namespace)
 	r, err := builder.InvokeBuilderServiceRestart(&build_rpc_v1.Request{
 		Name:       build.Name,
 		Branch:     build.Branch,
-		Url:        build.Git,
+		Url:        url,
 		Id:         int32(build.Id),
 		Language:   build.Language,
 		Lanversion: build.Lanversion,
