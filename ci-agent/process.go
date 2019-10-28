@@ -53,15 +53,20 @@ func control() {
 							if err != nil {
 								logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
 								bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
-								break
+								return
 							}
 							err = invokeDeployer(addr, string(params))
 							if err != nil {
 								logrus.Errorf("Invoke Deployer Error: %s. ", err)
 								bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
-								break
+								return
 							}
 						}
+					}
+					err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, s.Id, s.Name, s.User)
+					if err != nil{
+						logrus.Errorf("Update Deployer Error: %s. ", err)
+						return
 					}
 				}
 			}
