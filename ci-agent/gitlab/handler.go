@@ -74,13 +74,18 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
 
-	s.user = push.Commits[commits-1].Author.Email
-	if s.user == "" {
+	if commits == 0 {
 		s.user = push.UserUsername
+		s.message = ""
+	} else {
+		s.user = push.Commits[commits-1].Author.Email
+		if s.user == "" {
+			s.user = push.UserUsername
+		}
+		s.message = push.Commits[commits-1].Message
 	}
 
 	s.sha = push.CheckoutSha[:12]
-	s.message = push.Commits[commits-1].Message
 	s.namespace = push.Project.PathWithNamespace
 
 	bus := dataBus.GetBus()
