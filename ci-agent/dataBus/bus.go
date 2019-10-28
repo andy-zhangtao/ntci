@@ -64,6 +64,11 @@ type dataBus struct {
 	Postgres string `toml:"postgres"`
 
 	Pb *store.PGBus
+
+	// Deployer Valid Deployer Addr
+	// e.g.
+	// k8s="xxxx"
+	Deployer map[string]string `toml:"deployer"`
 }
 
 type buildService struct {
@@ -100,29 +105,6 @@ func GetBus() *dataBus {
 	return bus
 }
 
-//// drawOffImg
-//// Convert Language string to struct.
-//func drawOffImg(lan map[string][]string) map[string]map[string]string {
-//	runtime := make(map[string]map[string]string)
-//
-//	for key, value := range lan {
-//		image := make(map[string]string)
-//
-//		for _, v := range value {
-//			if strings.Contains(v, ":") {
-//				_v := strings.Split(v, ":")
-//				image[_v[0]] = _v[1]
-//			} else {
-//				image["latest"] = v
-//			}
-//		}
-//
-//		runtime[key] = image
-//	}
-//
-//	return runtime
-//}
-
 func debug() {
 	logrus.Debug("DATA-BUS")
 	logrus.Debug("*************************************")
@@ -137,6 +119,11 @@ func debug() {
 	logrus.Debugf("Build Mode: %s", bus.BuildMode)
 	for m, svc := range bus.Build {
 		logrus.Debugf("  %s:[%s]", m, svc.Addr)
+	}
+
+	logrus.Debug("Deployer:")
+	for n, addr := range bus.Deployer {
+		logrus.Debugf("  %s:[%s]", n, addr)
 	}
 
 	logrus.Debug("*************************************")

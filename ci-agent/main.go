@@ -6,6 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"ntci/ci-agent/dataBus"
+	"ntci/ci-agent/git"
 	"ntci/ci-agent/rpc"
 	"ntci/ci-agent/web"
 )
@@ -14,6 +15,7 @@ var port = 8000
 var gatewayPort = 8001
 
 var busFile = "ntci.toml"
+var status chan *git.Status
 
 /***
 * ci-agents
@@ -22,6 +24,7 @@ var busFile = "ntci.toml"
 *
  */
 func main() {
+	go control()
 	go rpc.Run(gatewayPort)
 	web.Run(port)
 }
@@ -57,4 +60,5 @@ func init() {
 		gatewayPort = bus.GateWayPort
 	}
 
+	status = make(chan *git.Status, 100)
 }

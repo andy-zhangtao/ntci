@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
 	"ntci/ci-agent/store"
@@ -120,6 +121,15 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nt, err := yaml.Marshal(n)
+
+	err = bus.Pb.AddNtci(s.user, s.name, s.branch, string(nt))
+	if err != nil {
+		logrus.Errorf("Save Configure Error. %s ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 }
 
 // converName conver '_' to '-'
