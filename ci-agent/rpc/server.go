@@ -73,6 +73,13 @@ func (g *gateway) RestartJob(ctx context.Context, in *gateway_rpc_v1.Builder) (*
 
 	bus.Pb.UpdataBuildStatus(int32(store.BuildEnv), build.Id, build.Name, build.User)
 
+	bus.JobStatus <- &dataBus.Status{
+		User:   build.User,
+		Name:   build.Name,
+		Id:     build.Id,
+		Stauts: store.BuildSuccess,
+	}
+
 	return &gateway_rpc_v1.Reply{
 		Code:    0,
 		Message: "OK",

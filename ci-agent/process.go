@@ -49,12 +49,14 @@ func control() {
 				if len(nt.Deployer) > 0 {
 					for filter, value := range nt.Deployer {
 						if addr, ok := bus.Deployer[filter]; ok {
+							logrus.Infof("k8s name: %s addr: %s", filter, addr)
 							params, err := yaml.Marshal(value)
 							if err != nil {
 								logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
 								bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
 								return
 							}
+
 							err = invokeDeployer(addr, string(params))
 							if err != nil {
 								logrus.Errorf("Invoke Deployer Error: %s. ", err)

@@ -119,25 +119,25 @@ func GetBus() *dataBus {
 }
 
 func debug() {
-	logrus.Debug("DATA-BUS")
-	logrus.Debug("*************************************")
-	logrus.Debugf("Web Server Listen: %d", bus.WebPort)
-	logrus.Debugf("Gateway Server Listen: %d", bus.GateWayPort)
-	logrus.Debugf("Postgresql Addr: %s", bus.Postgres)
+	logrus.Info("DATA-BUS")
+	logrus.Info("*************************************")
+	logrus.Infof("Web Server Listen: %d", bus.WebPort)
+	logrus.Infof("Gateway Server Listen: %d", bus.GateWayPort)
+	logrus.Infof("Postgresql Addr: %s", bus.Postgres)
 
 	if bus.Access.Gitlab.Token != "" {
-		logrus.Debugf("GitLab Token: %s", bus.Access.Gitlab.Token)
+		logrus.Infof("GitLab Token: %s", bus.Access.Gitlab.Token)
 	}
 
-	logrus.Debugf("Build Mode: %s", bus.BuildMode)
+	logrus.Infof("Build Mode: %s", bus.BuildMode)
 	for m, svc := range bus.Build {
-		logrus.Debugf("  %s:[%s]", m, svc.Addr)
+		logrus.Infof("  %s:[%s]", m, svc.Addr)
 	}
 
-	logrus.Debug("Deployer:")
+	logrus.Info("Deployer:")
 	for n, addr := range bus.Deployer {
-		logrus.Debugf("  %s:[%s]", n, addr)
+		logrus.Infof("  %s:[%s]", n, addr)
 	}
 
-	logrus.Debug("*************************************")
+	logrus.Info("*************************************")
 }
