@@ -63,16 +63,28 @@ type dataBus struct {
 	// Postgres metadata
 	Postgres string `toml:"postgres"`
 
-	Pb *store.PGBus
-
 	// Deployer Valid Deployer Addr
 	// e.g.
 	// k8s="xxxx"
 	Deployer map[string]string `toml:"deployer"`
+
+	Pb *store.PGBus
+
+	JobStatus chan *Status
 }
 
 type buildService struct {
 	Addr string `toml:"addr"`
+}
+
+// Status
+// Ntci Job Status
+type Status struct {
+	User   string
+	Name   string
+	Branch string
+	Id     int
+	Stauts int
 }
 
 /*
@@ -96,6 +108,7 @@ func InitDataBus(file string) (err error) {
 	}
 
 	bus.Pb = store.PG(bus.Postgres)
+	bus.JobStatus = make(chan *Status, 100)
 
 	debug()
 	return

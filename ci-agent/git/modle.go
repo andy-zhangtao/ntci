@@ -27,12 +27,3 @@ type Ntci struct {
 	Deployer    map[string]interface{} `yaml:"deploy"`
 }
 
-// Status
-// Ntci Job Status
-type Status struct {
-	User   string
-	Name   string
-	Branch string
-	Id     int
-	Stauts int
-}

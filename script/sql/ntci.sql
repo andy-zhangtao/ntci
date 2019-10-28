@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS "ntci"."ntci";
 CREATE TABLE "ntci"."ntci" (
   "owner" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "ntci" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "ntci" varchar(2048) COLLATE "pg_catalog"."default" NOT NULL,
   "branch" varchar(255) COLLATE "pg_catalog"."default" NOT NULL
 )
 ;

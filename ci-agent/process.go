@@ -20,7 +20,7 @@ func control() {
 
 	for {
 		select {
-		case s := <-status:
+		case s := <-bus.JobStatus:
 			switch s.Stauts {
 			case store.BuildSuccess:
 				d, err := bus.Pb.GetBuildByID(s.User, s.Name, s.Id)
@@ -64,7 +64,7 @@ func control() {
 						}
 					}
 					err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, s.Id, s.Name, s.User)
-					if err != nil{
+					if err != nil {
 						logrus.Errorf("Update Deployer Error: %s. ", err)
 						return
 					}

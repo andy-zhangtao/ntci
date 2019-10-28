@@ -92,6 +92,13 @@ func (g *gateway) JobStatus(ctx context.Context, in *gateway_rpc_v1.Builder) (*g
 		}, nil
 	}
 
+	bus.JobStatus <- &dataBus.Status{
+		User:   in.User,
+		Name:   in.Jname,
+		Id:     id,
+		Stauts: int(in.Status),
+	}
+
 	return &gateway_rpc_v1.Reply{
 		Code:    0,
 		Message: "OK",
