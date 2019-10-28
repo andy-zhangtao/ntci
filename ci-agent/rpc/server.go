@@ -120,6 +120,8 @@ func (g *gateway) GetBuild(ctx context.Context, in *gateway_rpc_v1.BuildRequest)
 			Sha:       ji.Sha,
 			Message:   ji.Message,
 			Namespace: ji.Namespace,
+			Lanuage:   ji.Language,
+			Lanver:    ji.Lanversion,
 		})
 	}
 

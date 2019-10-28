@@ -20,6 +20,8 @@ message JobDetail {
     string sha = 7;
     string message = 8;
     string namespace = 9;
+    string lanuage = 10;
+    string lanver = 11;
 }
 
 message JobInfo {
