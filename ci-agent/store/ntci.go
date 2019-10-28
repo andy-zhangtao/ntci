@@ -20,7 +20,7 @@ func (p *PGBus) AddNtci(user, name, branch, ntci string) (err error) {
 }
 
 func (p *PGBus) GetNtci(user, name, branch string) (ntci string, err error) {
-	sql := "SELECI ntci FROM ntci WHERE owner=$1 AND name=$2 AND branch=$3"
+	sql := "SELECT ntci FROM ntci WHERE owner=$1 AND name=$2 AND branch=$3"
 
 	logrus.Infof("Select SQL: %s . $1=%s, $2=%s, $2=%s", sql, user, name, branch)
 
