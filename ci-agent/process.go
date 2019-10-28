@@ -21,6 +21,7 @@ func control() {
 	for {
 		select {
 		case s := <-bus.JobStatus:
+			logrus.Infof("Receive status update msg")
 			switch s.Stauts {
 			case store.BuildSuccess:
 				d, err := bus.Pb.GetBuildByID(s.User, s.Name, s.Id)
@@ -46,6 +47,7 @@ func control() {
 					break
 				}
 
+				logrus.Infof("Deploy: [%v]",nt.Deployer)
 				if len(nt.Deployer) > 0 {
 					for filter, value := range nt.Deployer {
 						if addr, ok := bus.Deployer[filter]; ok {
