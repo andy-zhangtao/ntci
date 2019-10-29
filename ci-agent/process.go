@@ -109,7 +109,7 @@ func environmentConver(params string) string {
 }
 
 func converEnv(s string) string {
-	for i := 0; i < len(s); i++ {
+	for i := 0; i < len(s)-1; i++ {
 		if os.Getenv(s[0:i+1]) != "" {
 			return os.Getenv(s[0:i+1]) + s[i+1:]
 		}
