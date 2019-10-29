@@ -72,7 +72,7 @@ func deploy(user, name string, id int) {
 
 				p := string(params)
 				cp := environmentConver(p)
-				logrus.Debugf("k8s name: %s addr: %s params: %s env conver: %s", filter, addr, p, cp)
+				logrus.Infof("k8s name: %s addr: %s params: %s env conver: %s", filter, addr, p, cp)
 				err = invokeDeployer(addr, cp)
 				if err != nil {
 					logrus.Errorf("Invoke Deployer Error: %s. ", err)
@@ -100,7 +100,6 @@ func environmentConver(params string) string {
 
 		_subStr := subStr[1:]
 		for _, s := range _subStr {
-			fmt.Println(s)
 			result += converEnv(s)
 		}
 		return result
