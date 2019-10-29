@@ -180,14 +180,14 @@ func (p *PGBus) addBuildId(b Build) error {
 
 func (p *PGBus) updateBuild(status int32, b Build) error {
 	sql := "UPDATE build SET status=$1 WHERE name=$2 and id=$3 and owner=$4"
-	logrus.Infof("UPDATE Build Status SQL: %s $1=%d $2=%s $3=%d $4=%s", sql, status, b.Name, b.Id, b.User)
+	logrus.Debugf(("UPDATE Build Status SQL: %s $1=%d $2=%s $3=%d $4=%s", sql, status, b.Name, b.Id, b.User)
 	_, err := p.db.Exec(sql, status, b.Name, b.Id, b.User)
 	return err
 }
 
 func (p *PGBus) updateLanguage(lan, lanv string, b Build) error {
 	sql := "UPDATE build SET language=$1, langver=$2 WHERE name=$3 and id=$4 and owner=$5"
-	logrus.Infof("UPDATE Build Language SQL: %s . $1=%s $2=%s $3=%s $4=%d $5=%s", sql, lan, lanv, b.Name, b.Id, b.User)
+	logrus.Debugf(("UPDATE Build Language SQL: %s . $1=%s $2=%s $3=%s $4=%d $5=%s", sql, lan, lanv, b.Name, b.Id, b.User)
 	_, err := p.db.Exec(sql, lan, lanv, b.Name, b.Id, b.User)
 	return err
 }
