@@ -68,7 +68,7 @@ func deploy(user, name string, id int) {
 					return
 				}
 
-				logrus.Debugf(("k8s name: %s addr: %s params: %s", filter, addr, string(params))
+				logrus.Debugf("k8s name: %s addr: %s params: %s", filter, addr, string(params))
 				err = invokeDeployer(addr, string(params))
 				if err != nil {
 					logrus.Errorf("Invoke Deployer Error: %s. ", err)
