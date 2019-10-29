@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -68,8 +70,10 @@ func deploy(user, name string, id int) {
 					return
 				}
 
-				logrus.Debugf("k8s name: %s addr: %s params: %s", filter, addr, string(params))
-				err = invokeDeployer(addr, string(params))
+				p := string(params)
+				cp := environmentConver(p)
+				logrus.Debugf("k8s name: %s addr: %s params: %s env conver: %s", filter, addr, p, cp)
+				err = invokeDeployer(addr, cp)
 				if err != nil {
 					logrus.Errorf("Invoke Deployer Error: %s. ", err)
 					err = bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user)
@@ -86,6 +90,32 @@ func deploy(user, name string, id int) {
 			logrus.Errorf("Update Deployer Error: %s. ", err)
 		}
 	}
+}
+
+func environmentConver(params string) string {
+	if strings.Contains(params, "$") {
+
+		subStr := strings.Split(params, "$")
+		result := subStr[0]
+
+		_subStr := subStr[1:]
+		for _, s := range _subStr {
+			fmt.Println(s)
+			result += converEnv(s)
+		}
+		return result
+	}
+
+	return params
+}
+
+func converEnv(s string) string {
+	for i := 0; i < len(s); i++ {
+		if os.Getenv(s[0:i+1]) != "" {
+			return os.Getenv(s[0:i+1]) + s[i+1:]
+		}
+	}
+	return ""
 }
 
 func invokeDeployer(addr, params string) (err error) {
