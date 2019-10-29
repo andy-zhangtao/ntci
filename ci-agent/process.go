@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -92,15 +91,27 @@ func deploy(user, name string, id int) {
 	}
 }
 
-func environmentConver(params string) string {
+func environmentConver(params string, nt git.Ntci) string {
 	if strings.Contains(params, "$") {
 
 		subStr := strings.Split(params, "$")
 		result := subStr[0]
 
 		_subStr := subStr[1:]
+
+		env := make(map[string]string)
+
+		for _, e := range nt.Env {
+			_e := strings.Split(e, "=")
+			if len(_e) == 1 {
+				env[_e[0]] = ""
+			} else if len(_e) == 2 {
+				env[_e[0]] = _e[1]
+			}
+		}
+
 		for _, s := range _subStr {
-			result += converEnv(s)
+			result += converEnv(s, env)
 		}
 		return result
 	}
@@ -108,10 +119,10 @@ func environmentConver(params string) string {
 	return params
 }
 
-func converEnv(s string) string {
+func converEnv(s string, env map[string]string) string {
 	for i := 0; i < len(s)-1; i++ {
-		if os.Getenv(s[0:i+1]) != "" {
-			return os.Getenv(s[0:i+1]) + s[i+1:]
+		if env[s[0:i+1]] != "" {
+			return env[s[0:i+1]] + s[i+1:]
 		}
 		c := s[i+1]
 		if (c < 48 || (c >= 58 && c <= 64) || (c >= 91 && c <= 96) || c >= 123) && (c != 95 && c != 45) {
