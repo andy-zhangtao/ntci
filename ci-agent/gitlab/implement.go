@@ -102,7 +102,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		return errors.New("Invoke Build Service Failed ")
 	}
 
-	bus.Pb.UpdataBuildStatus(int32(store.BuildEnv), s.jid, s.name, s.user)
+	bus.Pb.UpdataBuildStatus(int32(store.BuildEnvSetup), s.jid, s.name, s.user)
 	logrus.Infof("Invoke Build Service Success: %d", r.Code)
 	return
 }

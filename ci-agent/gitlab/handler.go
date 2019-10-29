@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 	"ntci/ci-agent/dataBus"
 	"ntci/ci-agent/git"
 	"ntci/ci-agent/store"
@@ -74,13 +75,18 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
 
-	s.user = push.Commits[commits-1].Author.Email
-	if s.user == "" {
+	if commits == 0 {
 		s.user = push.UserUsername
+		s.message = ""
+	} else {
+		s.user = push.Commits[commits-1].Author.Email
+		if s.user == "" {
+			s.user = push.UserUsername
+		}
+		s.message = push.Commits[commits-1].Message
 	}
 
 	s.sha = push.CheckoutSha[:12]
-	s.message = push.Commits[commits-1].Message
 	s.namespace = push.Project.PathWithNamespace
 
 	bus := dataBus.GetBus()
@@ -115,6 +121,15 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nt, err := yaml.Marshal(n)
+
+	err = bus.Pb.AddNtci(s.user, s.name, s.branch, string(nt))
+	if err != nil {
+		logrus.Errorf("Save Configure Error. %s ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 }
 
 // converName conver '_' to '-'

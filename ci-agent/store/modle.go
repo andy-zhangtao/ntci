@@ -21,9 +21,12 @@ type Build struct {
 }
 
 const (
-	BuildReady   = 0
-	BuildEnv     = 2
-	Building     = 3
-	BuildSuccess = 4
-	BuildFailed  = -4
+	BuildReady    = 0
+	BuildEnvSetup = 2
+	Building      = 3
+	BuildSuccess  = 4
+	BuildFailed   = -4
+	ProcessFailed = -1
+	DeploySuccess = 5
+	DeployFailed  = -5
 )

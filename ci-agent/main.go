@@ -22,6 +22,7 @@ var busFile = "ntci.toml"
 *
  */
 func main() {
+	go control()
 	go rpc.Run(gatewayPort)
 	web.Run(port)
 }

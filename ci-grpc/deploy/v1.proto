@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "deploy.rpc.v1";
+
+message DeployRequest {
+    string addr = 1; // Control Address. Deployer update status via this addr
+    string param = 2; // Control will decode all params into string.
+}
+
+message DeployReply {
+    int32 code = 1;
+    string msg = 2;
+}
+
+service DeployService {
+    rpc RestartJob (DeployRequest) returns (DeployReply) {
+
+    }
+}

@@ -322,7 +322,9 @@ proto.JobDetail.toObject = function(includeInstance, msg) {
     id: jspb.Message.getFieldWithDefault(msg, 6, 0),
     sha: jspb.Message.getFieldWithDefault(msg, 7, ""),
     message: jspb.Message.getFieldWithDefault(msg, 8, ""),
-    namespace: jspb.Message.getFieldWithDefault(msg, 9, "")
+    namespace: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    lanuage: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    lanver: jspb.Message.getFieldWithDefault(msg, 11, "")
   };
 
   if (includeInstance) {
@@ -394,6 +396,14 @@ proto.JobDetail.deserializeBinaryFromReader = function(msg, reader) {
     case 9:
       var value = /** @type {string} */ (reader.readString());
       msg.setNamespace(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLanuage(value);
+      break;
+    case 11:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLanver(value);
       break;
     default:
       reader.skipField();
@@ -484,6 +494,20 @@ proto.JobDetail.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       9,
+      f
+    );
+  }
+  f = message.getLanuage();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
+      f
+    );
+  }
+  f = message.getLanver();
+  if (f.length > 0) {
+    writer.writeString(
+      11,
       f
     );
   }
@@ -649,6 +673,42 @@ proto.JobDetail.prototype.getNamespace = function() {
  */
 proto.JobDetail.prototype.setNamespace = function(value) {
   return jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+/**
+ * optional string lanuage = 10;
+ * @return {string}
+ */
+proto.JobDetail.prototype.getLanuage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.JobDetail} returns this
+ */
+proto.JobDetail.prototype.setLanuage = function(value) {
+  return jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * optional string lanver = 11;
+ * @return {string}
+ */
+proto.JobDetail.prototype.getLanver = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.JobDetail} returns this
+ */
+proto.JobDetail.prototype.setLanver = function(value) {
+  return jspb.Message.setProto3StringField(this, 11, value);
 };
 
 

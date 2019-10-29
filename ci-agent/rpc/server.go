@@ -71,7 +71,7 @@ func (g *gateway) RestartJob(ctx context.Context, in *gateway_rpc_v1.Builder) (*
 		}, errors.New(fmt.Sprintf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message))
 	}
 
-	bus.Pb.UpdataBuildStatus(int32(store.BuildEnv), build.Id, build.Name, build.User)
+	bus.Pb.UpdataBuildStatus(int32(store.BuildEnvSetup), build.Id, build.Name, build.User)
 
 	return &gateway_rpc_v1.Reply{
 		Code:    0,
@@ -90,6 +90,13 @@ func (g *gateway) JobStatus(ctx context.Context, in *gateway_rpc_v1.Builder) (*g
 			Code:    -1,
 			Message: err.Error(),
 		}, nil
+	}
+
+	bus.JobStatus <- &dataBus.Status{
+		User:   in.User,
+		Name:   in.Jname,
+		Id:     id,
+		Stauts: int(in.Status),
 	}
 
 	return &gateway_rpc_v1.Reply{
@@ -120,6 +127,8 @@ func (g *gateway) GetBuild(ctx context.Context, in *gateway_rpc_v1.BuildRequest)
 			Sha:       ji.Sha,
 			Message:   ji.Message,
 			Namespace: ji.Namespace,
+			Lanuage:   ji.Language,
+			Lanver:    ji.Lanversion,
 		})
 	}
 
