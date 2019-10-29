@@ -113,6 +113,10 @@ func converEnv(s string) string {
 		if os.Getenv(s[0:i+1]) != "" {
 			return os.Getenv(s[0:i+1]) + s[i+1:]
 		}
+		c := s[i+1]
+		if c < 48 || (c >= 58 && c <= 64) || (c >= 91 && c <= 96) || c >= 123 {
+			return s[i+1:]
+		}
 	}
 	return ""
 }
