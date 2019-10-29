@@ -21,7 +21,6 @@ func control() {
 	for {
 		select {
 		case s := <-bus.JobStatus:
-			logrus.Infof("Receive status update msg")
 			switch s.Stauts {
 			case store.BuildSuccess:
 				go deploy(s.User, s.Name, s.Id)
@@ -63,7 +62,7 @@ func deploy(user, name string, id int) {
 				if err != nil {
 					logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
 					bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
-					break
+					return
 				}
 
 				logrus.Infof("k8s name: %s addr: %s params: %s", filter, addr, string(params))
@@ -71,17 +70,17 @@ func deploy(user, name string, id int) {
 				if err != nil {
 					logrus.Errorf("Invoke Deployer Error: %s. ", err)
 					bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
-					break
+					return
 				}
 			}
 		}
 
-		if err != nil {
-			if err := bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user); err != nil {
-				logrus.Errorf("Update Deployer Error: %s. ", err)
-				return
-			}
-		}
+		//if err != nil {
+		//	if err := bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user); err != nil {
+		//		logrus.Errorf("Update Deployer Error: %s. ", err)
+		//		return
+		//	}
+		//}
 
 		err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, id, name, user)
 		if err != nil {
