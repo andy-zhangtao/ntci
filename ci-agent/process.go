@@ -24,56 +24,61 @@ func control() {
 			logrus.Infof("Receive status update msg")
 			switch s.Stauts {
 			case store.BuildSuccess:
-				d, err := bus.Pb.GetBuildByID(s.User, s.Name, s.Id)
+				go deploy(s.User, s.Name, s.Id)
+			}
+		}
+	}
+}
+
+func deploy(user, name string, id int) {
+	bus := dataBus.GetBus()
+	d, err := bus.Pb.GetBuildByID(user, name, id)
+	if err != nil {
+		logrus.Errorf("Query Build Error: %s. Filter: user:%s. name: %s. id: %d", err, user, name, id)
+		bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+		return
+	}
+
+	nts, err := bus.Pb.GetNtci(user, name, d.Branch)
+	if err != nil {
+		logrus.Errorf("Get Ntci Error: %s. Filter: user:%s. name: %s. id: %d", err, user, name, id)
+		bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+		return
+	}
+
+	var nt git.Ntci
+
+	err = yaml.Unmarshal([]byte(nts), &nt)
+	if err != nil {
+		logrus.Errorf("Unmarshal Ntci Error: %s. Content: %s", err, nts)
+		bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+		return
+	}
+
+	logrus.Infof("Deploy: [%v]", nt.Deployer)
+	if len(nt.Deployer) > 0 {
+		for filter, value := range nt.Deployer {
+			if addr, ok := bus.Deployer[filter]; ok {
+				params, err := yaml.Marshal(value)
 				if err != nil {
-					logrus.Errorf("Query Build Error: %s. Filter: user:%s. name: %s. id: %d", err, s.User, s.Name, s.Id)
-					bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
-					break
+					logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
+					bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+					return
 				}
 
-				nts, err := bus.Pb.GetNtci(s.User, s.Name, d.Branch)
+				logrus.Infof("k8s name: %s addr: %s params: %s", filter, addr, string(params))
+				err = invokeDeployer(addr, string(params))
 				if err != nil {
-					logrus.Errorf("Get Ntci Error: %s. Filter: user:%s. name: %s. id: %d", err, s.User, s.Name, s.Id)
-					bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
-					break
-				}
-
-				var nt git.Ntci
-
-				err = yaml.Unmarshal([]byte(nts), &nt)
-				if err != nil {
-					logrus.Errorf("Unmarshal Ntci Error: %s. Content: %s", err, nts)
-					bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
-					break
-				}
-
-				logrus.Infof("Deploy: [%v]",nt.Deployer)
-				if len(nt.Deployer) > 0 {
-					for filter, value := range nt.Deployer {
-						if addr, ok := bus.Deployer[filter]; ok {
-							params, err := yaml.Marshal(value)
-							if err != nil {
-								logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
-								bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
-								return
-							}
-
-							logrus.Infof("k8s name: %s addr: %s params: %s", filter, addr, string(params))
-							err = invokeDeployer(addr, string(params))
-							if err != nil {
-								logrus.Errorf("Invoke Deployer Error: %s. ", err)
-								bus.Pb.UpdataBuildStatus(store.ProcessFailed, s.Id, s.Name, s.User)
-								return
-							}
-						}
-					}
-					err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, s.Id, s.Name, s.User)
-					if err != nil {
-						logrus.Errorf("Update Deployer Error: %s. ", err)
-						return
-					}
+					logrus.Errorf("Invoke Deployer Error: %s. ", err)
+					bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+					return
 				}
 			}
+		}
+
+		err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, id, name, user)
+		if err != nil {
+			logrus.Errorf("Update Deployer Error: %s. ", err)
 		}
 	}
 }
