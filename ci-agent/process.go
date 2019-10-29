@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -70,7 +71,7 @@ func deploy(user, name string, id int) {
 				}
 
 				p := string(params)
-				cp := environmentConver(p, nt)
+				cp := environmentConver(p, nt, d)
 				logrus.Infof("k8s name: %s addr: %s params: %s env conver: %s", filter, addr, p, cp)
 				err = invokeDeployer(addr, cp)
 				if err != nil {
@@ -91,7 +92,7 @@ func deploy(user, name string, id int) {
 	}
 }
 
-func environmentConver(params string, nt git.Ntci) string {
+func environmentConver(params string, nt git.Ntci, d store.Build) string {
 	if strings.Contains(params, "$") {
 
 		subStr := strings.Split(params, "$")
@@ -99,17 +100,7 @@ func environmentConver(params string, nt git.Ntci) string {
 
 		_subStr := subStr[1:]
 
-		env := make(map[string]string)
-
-		for _, e := range nt.Env {
-			_e := strings.Split(e, "=")
-			if len(_e) == 1 {
-				env[_e[0]] = ""
-			} else if len(_e) == 2 {
-				env[_e[0]] = _e[1]
-			}
-		}
-
+		env := fillNTCIEnvironment(nt, d)
 		for _, s := range _subStr {
 			result += converEnv(s, env)
 		}
@@ -155,4 +146,25 @@ func invokeDeployer(addr, params string) (err error) {
 	}
 
 	return nil
+}
+
+func fillNTCIEnvironment(nt git.Ntci, b store.Build) map[string]string {
+	var env = map[string]string{
+		"NTCI_BUILDER_SHA":    b.Sha,
+		"NTCI_BUILDER_USER":   b.User,
+		"NTCI_BUILDER_JID":    strconv.Itoa(b.Id),
+		"NTCI_BUILDER_GIT":    b.Git,
+		"NTCI_BUILDER_BRANCH": b.Branch,
+	}
+
+	for _, e := range nt.Env {
+		_e := strings.Split(e, "=")
+		if len(_e) == 1 {
+			env[_e[0]] = ""
+		} else if len(_e) == 2 {
+			env[_e[0]] = _e[1]
+		}
+	}
+
+	return env
 }
