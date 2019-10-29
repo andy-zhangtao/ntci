@@ -76,6 +76,7 @@ func deploy(user, name string, id int) {
 					if err != nil {
 						logrus.Errorf("Update Deployer Error: %s. ", err)
 					}
+					return
 				}
 			}
 		}

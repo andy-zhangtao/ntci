@@ -180,7 +180,7 @@ func (p *PGBus) addBuildId(b Build) error {
 
 func (p *PGBus) updateBuild(status int32, b Build) error {
 	sql := "UPDATE build SET status=$1 WHERE name=$2 and id=$3 and owner=$4"
-	logrus.Infof("UPDATE Build Status SQL: %s ", sql)
+	logrus.Infof("UPDATE Build Status SQL: %s $1=%d $2=%s $3=%d $4=%s", sql, status, b.Name, b.Id, b.User)
 	_, err := p.db.Exec(sql, status, b.Name, b.Id, b.User)
 	return err
 }

@@ -71,14 +71,7 @@ func (g *gateway) RestartJob(ctx context.Context, in *gateway_rpc_v1.Builder) (*
 		}, errors.New(fmt.Sprintf("Invoke Build Service Failed.  %d, %s", r.Code, r.Message))
 	}
 
-	bus.Pb.UpdataBuildStatus(int32(store.BuildEnv), build.Id, build.Name, build.User)
-
-	//bus.JobStatus <- &dataBus.Status{
-	//	User:   build.User,
-	//	Name:   build.Name,
-	//	Id:     build.Id,
-	//	Stauts: store.BuildSuccess,
-	//}
+	bus.Pb.UpdataBuildStatus(int32(store.BuildEnvSetup), build.Id, build.Name, build.User)
 
 	return &gateway_rpc_v1.Reply{
 		Code:    0,
