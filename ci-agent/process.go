@@ -35,14 +35,14 @@ func deploy(user, name string, id int) {
 	d, err := bus.Pb.GetBuildByID(user, name, id)
 	if err != nil {
 		logrus.Errorf("Query Build Error: %s. Filter: user:%s. name: %s. id: %d", err, user, name, id)
-		bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+		bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
 		return
 	}
 
 	nts, err := bus.Pb.GetNtci(user, name, d.Branch)
 	if err != nil {
 		logrus.Errorf("Get Ntci Error: %s. Filter: user:%s. name: %s. id: %d", err, user, name, id)
-		bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+		bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
 		return
 	}
 
@@ -51,7 +51,7 @@ func deploy(user, name string, id int) {
 	err = yaml.Unmarshal([]byte(nts), &nt)
 	if err != nil {
 		logrus.Errorf("Unmarshal Ntci Error: %s. Content: %s", err, nts)
-		bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
+		bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
 		return
 	}
 
@@ -62,17 +62,24 @@ func deploy(user, name string, id int) {
 				params, err := yaml.Marshal(value)
 				if err != nil {
 					logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
-					bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
-					return
+					bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
+					break
 				}
 
 				logrus.Infof("k8s name: %s addr: %s params: %s", filter, addr, string(params))
 				err = invokeDeployer(addr, string(params))
 				if err != nil {
 					logrus.Errorf("Invoke Deployer Error: %s. ", err)
-					bus.Pb.UpdataBuildStatus(store.ProcessFailed, id, user, name)
-					return
+					bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
+					break
 				}
+			}
+		}
+
+		if err != nil {
+			if err := bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user); err != nil {
+				logrus.Errorf("Update Deployer Error: %s. ", err)
+				return
 			}
 		}
 

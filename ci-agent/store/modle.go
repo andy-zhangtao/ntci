@@ -26,6 +26,7 @@ const (
 	Building      = 3
 	BuildSuccess  = 4
 	BuildFailed   = -4
-	ProcessFailed = -5
+	ProcessFailed = -1
 	DeploySuccess = 5
+	DeployFailed  = -5
 )
