@@ -61,7 +61,10 @@ func deploy(user, name string, id int) {
 				params, err := yaml.Marshal(value)
 				if err != nil {
 					logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
-					bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
+					err = bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user)
+					if err != nil {
+						logrus.Errorf("Update Deployer Error: %s. ", err)
+					}
 					return
 				}
 
@@ -69,18 +72,13 @@ func deploy(user, name string, id int) {
 				err = invokeDeployer(addr, string(params))
 				if err != nil {
 					logrus.Errorf("Invoke Deployer Error: %s. ", err)
-					bus.Pb.UpdataBuildStatus(store.DeployFailed, id, user, name)
-					return
+					err = bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user)
+					if err != nil {
+						logrus.Errorf("Update Deployer Error: %s. ", err)
+					}
 				}
 			}
 		}
-
-		//if err != nil {
-		//	if err := bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user); err != nil {
-		//		logrus.Errorf("Update Deployer Error: %s. ", err)
-		//		return
-		//	}
-		//}
 
 		err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, id, name, user)
 		if err != nil {
