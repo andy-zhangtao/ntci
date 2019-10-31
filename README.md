@@ -1,4 +1,4 @@
-# ntci [![Build Status](https://travis-ci.org/andy-zhangtao/ntci.svg?branch=master)](https://travis-ci.org/andy-zhangtao/ntci)
+# ntci [![Build Status](https://travis-ci.org/andy-zhangtao/ntci.svg?branch=master)](https://travis-ci.org/andy-zhangtao/ntci) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.lapots.breed.judge%3Ajudge-rule-engine&metric=bugs)](https://sonarcloud.io/dashboard?id=com.lapots.breed.judge%3Ajudge-rule-engine)
 A New Tiny CI Tool
 
 ## Agents
