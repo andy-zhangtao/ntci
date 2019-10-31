@@ -10,14 +10,14 @@ func (p *PGBus) AddNtci(user, name, branch, ntci string) (err error) {
 
 	if _n != "" {
 		sql := "UPDATE ntci SET ntci=$1 WHERE owner=$2 AND name=$3 AND branch=$4"
-		logrus.Infof("Update ntci SQL: %s", sql)
+		logrus.Debugf("Update ntci SQL: %s", sql)
 
 		_, err = p.db.Exec(sql, ntci, user, name, branch)
 		return err
 	}
 
 	sql := "INSERT INTO ntci (owner, name, branch, ntci) VALUES($1, $2, $3, $4)"
-	logrus.Infof("Insert ntci SQL: %s", sql)
+	logrus.Debugf("Insert ntci SQL: %s", sql)
 
 	_, err = p.db.Exec(sql, user, name, branch, ntci)
 	return err
@@ -26,7 +26,7 @@ func (p *PGBus) AddNtci(user, name, branch, ntci string) (err error) {
 func (p *PGBus) GetNtci(user, name, branch string) (ntci string, err error) {
 	sql := "SELECT ntci FROM ntci WHERE owner=$1 AND name=$2 AND branch=$3"
 
-	logrus.Infof("Select SQL: %s . $1=%s, $2=%s, $2=%s", sql, user, name, branch)
+	logrus.Debugf("Select SQL: %s . $1=%s, $2=%s, $2=%s", sql, user, name, branch)
 
 	rows, err := p.db.Query(sql, user, name, branch)
 	if err != nil {

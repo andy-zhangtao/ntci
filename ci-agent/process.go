@@ -58,37 +58,40 @@ func deploy(user, name string, id int) {
 
 	logrus.Debugf("Deploy: [%v]", nt.Deployer)
 	if len(nt.Deployer) > 0 {
-		for filter, value := range nt.Deployer {
-			if addr, ok := bus.Deployer[filter]; ok {
-				params, err := yaml.Marshal(value)
-				if err != nil {
-					logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
-					err = bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user)
+		if ploy, ok := nt.Deployer[d.Branch]; ok {
+			for filter, value := range ploy {
+				if addr, ok := bus.Deployer[filter]; ok {
+					params, err := yaml.Marshal(value)
 					if err != nil {
-						logrus.Errorf("Update Deployer Error: %s. ", err)
+						logrus.Errorf("Marshal Ntci Error: %s. Content: %s", err, nt.Deployer)
+						err = bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user)
+						if err != nil {
+							logrus.Errorf("Update Deployer Error: %s. ", err)
+						}
+						return
 					}
-					return
-				}
 
-				p := string(params)
-				cp := environmentConver(p, nt, d)
-				logrus.Infof("k8s name: %s addr: %s params: %s env conver: %s", filter, addr, p, cp)
-				err = invokeDeployer(addr, cp)
-				if err != nil {
-					logrus.Errorf("Invoke Deployer Error: %s. ", err)
-					err = bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user)
+					p := string(params)
+					cp := environmentConver(p, nt, d)
+					logrus.Infof("k8s name: %s addr: %s params: %s env conver: %s", filter, addr, p, cp)
+					err = invokeDeployer(addr, cp)
 					if err != nil {
-						logrus.Errorf("Update Deployer Error: %s. ", err)
+						logrus.Errorf("Invoke Deployer Error: %s. ", err)
+						err = bus.Pb.UpdataBuildStatus(store.DeployFailed, id, name, user)
+						if err != nil {
+							logrus.Errorf("Update Deployer Error: %s. ", err)
+						}
+						return
 					}
-					return
 				}
+			}
+
+			err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, id, name, user)
+			if err != nil {
+				logrus.Errorf("Update Deployer Error: %s. ", err)
 			}
 		}
 
-		err = bus.Pb.UpdataBuildStatus(store.DeploySuccess, id, name, user)
-		if err != nil {
-			logrus.Errorf("Update Deployer Error: %s. ", err)
-		}
 	}
 }
 

@@ -18,11 +18,11 @@ before_install:
   - echo "$DOCKER_PASSWD" | docker login -u "$DOCKER_USER" --password-stdin
 
 install:
-  - go build -o bin/ntci ci-agent/*.go
-  - CGO_ENABLED=0 go build -o bin/k8s-build-server ci-build/k8s/*.go
-  - go build -o bin/ntci-builder ci-builder/*.go
-  - go build -o bin/ntci-deployer-systemd ci-deployer/systemd/*.go
-  - go build -o bin/ntci-deployer-k8s ci-deployer/k8s/*.go
+  - go build -mod=vendor -o bin/ntci ci-agent/*.go
+  - CGO_ENABLED=0 go build -mod=vendor -o bin/k8s-build-server ci-build/k8s/*.go
+  - go build -mod=vendor -o bin/ntci-builder ci-builder/*.go
+  - go build -mod=vendor -o bin/ntci-deployer-systemd ci-deployer/systemd/*.go
+  - go build -mod=vendor -o bin/ntci-deployer-k8s ci-deployer/k8s/*.go
 
 after_script:
   - docker build -t ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.ntci .
