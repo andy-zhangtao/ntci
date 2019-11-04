@@ -2,6 +2,7 @@ package store
 
 import (
 	"database/sql"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -45,5 +46,8 @@ func pgInit(addr string) {
 		logrus.Fatalf("Ping Postgres Error: %s", err.Error())
 	}
 
+	db.SetMaxOpenConns(50)
+	db.SetMaxIdleConns(30)
+	db.SetConnMaxLifetime(5 * time.Minute)
 	logrus.Info("Connect Postgres Success.")
 }
