@@ -1,0 +1,4 @@
+FROM maven:3-jdk-8
+COPY bin/ntci-builder /ntci-builder
+ENV NTCI_BUILDER_ROOT=/root
+ENTRYPOINT ["/ntci-builder"]
