@@ -15,6 +15,7 @@ func (p *PGBus) GetCommonEnv() (env map[string]string, err error) {
 	if err != nil {
 		return
 	}
+	defer rows.Close()
 
 	env = make(map[string]string)
 
@@ -40,6 +41,7 @@ func (p *PGBus) GetBuildByID(user, name string, id int) (b Build, err error) {
 		return
 	}
 
+	defer rows.Close()
 	if rows.Next() {
 		err = rows.Scan(&b.Name, &b.Id, &b.Branch, &b.Git, &b.Timestamp, &b.Status, &b.User, &b.Sha, &b.Message, &b.Language, &b.Lanversion, &b.Namespace)
 		if err != nil {
@@ -85,6 +87,7 @@ func (p *PGBus) GetBuild(user, name string) (bs []Build, err error) {
 
 	}
 
+	rows.Close()
 	return
 }
 
@@ -156,6 +159,7 @@ func (p *PGBus) getNextId(b Build) (id int, err error) {
 		return 0, err
 	}
 
+	defer rows.Close()
 	if rows.Next() {
 		rows.Scan(&id)
 		return id, p.addBuildId(b)
