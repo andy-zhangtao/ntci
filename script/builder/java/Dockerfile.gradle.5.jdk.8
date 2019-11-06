@@ -1,4 +1,4 @@
-FROM vikings/ntci-base-java:maven-3-jdk8
+FROM vikings/ntci-base-java:grade-5-jre8
 COPY bin/ntci-builder /ntci-builder
 ENV NTCI_BUILDER_ROOT=/root
 ENTRYPOINT ["/ntci-builder"]
