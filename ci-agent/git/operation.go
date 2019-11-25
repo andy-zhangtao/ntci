@@ -23,6 +23,7 @@ func ParseAndExecuteBuild(g GitOperation) (n Ntci, err error) {
 	logrus.Debugf("  Build: %v", n.Build)
 	logrus.Debugf("  AfterBuild: %v", n.AfterBuild)
 	logrus.Debugf("  BeforeBuild: %v", n.BeforeBuild)
+	logrus.Debugf("  Deploy: %v", n.Deployer)
 
 	if !g.VerifyNtci(n) {
 		err = errors.New("Invalid ntci configure ")
