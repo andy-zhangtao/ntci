@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -140,6 +141,9 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
+
+	w.Write([]byte(fmt.Sprintf("%s-%d", s.name, s.jid)))
+	return
 }
 
 // converName conver '_' to '-'
