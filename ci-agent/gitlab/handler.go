@@ -86,7 +86,10 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		s.message = push.Commits[commits-1].Message
 	}
 
-	s.sha = push.CheckoutSha[:12]
+	if push.CheckoutSha != "" {
+		s.sha = push.CheckoutSha[:12]
+	}
+
 	s.namespace = push.Project.PathWithNamespace
 
 	bus := dataBus.GetBus()
