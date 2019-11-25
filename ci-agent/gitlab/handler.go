@@ -37,6 +37,7 @@ type Service struct {
 	sha        string
 	message    string
 	namespace  string
+	buidScript string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -114,25 +115,25 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	s.jid = id
 
-	buildScript := ""
+	//buildScript := ""
 	if push.Build != "" {
-		buildScript = push.Build
-	} else {
-		n, err := git.ParseAndExecuteBuild(s)
-		logrus.Debugf("ntct.yml: %v", n)
-
-		if err != nil {
-			logrus.Errorf("Build Error. %s ", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
-		}
-
-		nt, err := yaml.Marshal(n)
-		buildScript = string(nt)
+		s.buidScript = push.Build
 	}
 
-	err = bus.Pb.AddNtci(s.user, s.name, s.branch, buildScript)
+	n, err := git.ParseAndExecuteBuild(s)
+	logrus.Debugf("ntct.yml: %v", n)
+
+	if err != nil {
+		logrus.Errorf("Build Error. %s ", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	nt, err := yaml.Marshal(n)
+	//buildScript = string(nt)
+
+	err = bus.Pb.AddNtci(s.user, s.name, s.branch, string(nt))
 	if err != nil {
 		logrus.Errorf("Save Configure Error. %s ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
