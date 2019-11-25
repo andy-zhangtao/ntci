@@ -114,19 +114,25 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	s.jid = id
 
-	n, err := git.ParseAndExecuteBuild(s)
-	logrus.Debugf("ntct.yml: %v", n)
+	buildScript := ""
+	if push.Build != "" {
+		buildScript = push.Build
+	} else {
+		n, err := git.ParseAndExecuteBuild(s)
+		logrus.Debugf("ntct.yml: %v", n)
 
-	if err != nil {
-		logrus.Errorf("Build Error. %s ", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+		if err != nil {
+			logrus.Errorf("Build Error. %s ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		nt, err := yaml.Marshal(n)
+		buildScript = string(nt)
 	}
 
-	nt, err := yaml.Marshal(n)
-
-	err = bus.Pb.AddNtci(s.user, s.name, s.branch, string(nt))
+	err = bus.Pb.AddNtci(s.user, s.name, s.branch, buildScript)
 	if err != nil {
 		logrus.Errorf("Save Configure Error. %s ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
