@@ -67,7 +67,7 @@ func git() (err error) {
 
 	f.Close()
 
-	return exec.Command("sh", "/git.sh").Run()
+	return exec.Command("bash", "/git.sh").Run()
 }
 
 //parse
@@ -151,7 +151,7 @@ func build(nt ntci) (err error) {
 		}
 	}
 
-	return nil
+	return err
 }
 
 func run() (err error) {
