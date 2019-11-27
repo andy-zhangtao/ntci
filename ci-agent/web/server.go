@@ -33,7 +33,8 @@ Generate api path and handler function map.
 */
 func (a *api) gatherAPI() {
 	a.apiMap[wrapAPI("/version")] = version
-	a.apiMap[wrapAPI("/gitlab/push")] = new(gitlab.Service).GitCallBack
+	//a.apiMap[wrapAPI("/gitlab/push")] = new(gitlab.Service).GitCallBack
+	a.apiMap[wrapAPI("/gitlab/push")] = gitlab.Service{}.GitCallBack
 }
 
 /**
