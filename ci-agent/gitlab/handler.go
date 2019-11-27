@@ -123,7 +123,7 @@ func (s Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		s.buidScript = push.Build
 	}
 
-	n, err := git.ParseAndExecuteBuild(s)
+	n, err := git.ParseAndExecuteBuild(&s)
 	logrus.Debugf("ntct.yml: %v", n)
 
 	if err != nil {
