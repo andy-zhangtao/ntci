@@ -42,7 +42,7 @@ type Service struct {
 	dockerfile string
 }
 
-func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
+func (s Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logrus.Errorf("Read Git Lab Request Error. %s ", err.Error())
