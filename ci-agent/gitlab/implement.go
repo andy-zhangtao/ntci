@@ -93,6 +93,7 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 		Sha:        s.sha,
 		Message:    s.message,
 		Env:        env,
+		Dockerfile: s.dockerfile,
 	})
 
 	if err != nil {

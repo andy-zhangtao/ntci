@@ -39,6 +39,7 @@ type Service struct {
 	message    string
 	namespace  string
 	buidScript string
+	dockerfile string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -76,6 +77,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	s.commit = push.CheckoutSha
 	s.webURL = push.Project.HTTPURL
 	s.url = drawOffUrl(push)
+	s.dockerfile = push.Dockerfile
 
 	if commits == 0 {
 		s.user = push.UserUsername

@@ -27,6 +27,7 @@ message Request {
     string message = 10;
     // build env
     map<string, string> env = 11;
+    string dockerfile = 12;
 }
 
 message Reply {

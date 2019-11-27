@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strconv"
@@ -153,6 +154,10 @@ func NewJob(b store.Build, commenv map[string]string) (err error) {
 								{
 									Name:  "NTCI_BUILDER_ADDR",
 									Value: b.Addr,
+								},
+								{
+									Name:  "NTCI_BUILDER_DOCKERFILE",
+									Value: base64.StdEncoding.EncodeToString([]byte(b.Dockerfile)),
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
