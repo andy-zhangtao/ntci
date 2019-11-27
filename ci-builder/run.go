@@ -129,7 +129,6 @@ func build(nt ntci) (err error) {
 		logrus.Info(scanner.Text())
 	}
 
-	success := false
 	if err := cmd.Wait(); err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			// The program has exited with an exit code != 0
@@ -141,7 +140,7 @@ func build(nt ntci) (err error) {
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 
 				if status.ExitStatus() == 0 {
-					success = true
+					return nil
 				}
 				logrus.Infof("Exit Status: %d", status.ExitStatus())
 				return errors.New(fmt.Sprintf("Exit Status: %d", status.ExitStatus()))
