@@ -18,6 +18,7 @@ import (
 
 func (s *Service) FetchNtCI() (n git.Ntci, err error) {
 	if s.buidScript != "" {
+		logrus.Debugf("User Build Script %s", s.buidScript)
 		err = yaml.Unmarshal([]byte(s.buidScript), &n)
 		return n, err
 	}
