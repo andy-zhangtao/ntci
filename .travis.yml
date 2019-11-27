@@ -41,7 +41,7 @@ after_script:
   - docker push ${NTCI_IMG_NAME}-java:maven-3-jdk-8
   - docker build -t ${NTCI_IMG_NAME}-java:gradle-5-jdk-8 -f script/builder/java/Dockerfile.gradle.5.jdk.8 .
   - docker push ${NTCI_IMG_NAME}-java:gradle-5-jdk-8
-  - docker build -t ${NTCI_IMG_DEPLOY}:systemd-latest -f Dockerfile.deploy-systemd .
-  - docker push ${NTCI_IMG_DEPLOY}:systemd-latest
-  - docker build -t ${NTCI_IMG_DEPLOY}:k8s-latest -f Dockerfile.deploy-k8s .
-  - docker push ${NTCI_IMG_DEPLOY}:k8s-latest
+  - docker build -t ${NTCI_IMG_DEPLOY}:systemd-${TRAVIS_BRANCH} -f Dockerfile.deploy-systemd .
+  - docker push ${NTCI_IMG_DEPLOY}:systemd-${TRAVIS_BRANCH}
+  - docker build -t ${NTCI_IMG_DEPLOY}:k8s-${TRAVIS_BRANCH} -f Dockerfile.deploy-k8s .
+  - docker push ${NTCI_IMG_DEPLOY}:k8s-${TRAVIS_BRANCH}
