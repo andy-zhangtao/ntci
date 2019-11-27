@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"syscall"
 	"text/template"
 
 	"github.com/sirupsen/logrus"
@@ -115,7 +116,7 @@ func build(nt ntci) (err error) {
 	stdout, err := cmd.StdoutPipe()
 	if err = cmd.Start(); err != nil {
 		logrus.Error(err)
-		return
+		return err
 	}
 
 	//out, err := cmd.CombinedOutput()
@@ -128,7 +129,30 @@ func build(nt ntci) (err error) {
 		logrus.Info(scanner.Text())
 	}
 
-	return err
+	success := false
+	if err := cmd.Wait(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			// The program has exited with an exit code != 0
+
+			// This works on both Unix and Windows. Although package
+			// syscall is generally platform dependent, WaitStatus is
+			// defined for both Unix and Windows and in both cases has
+			// an ExitStatus() method with the same signature.
+			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+
+				if status.ExitStatus() == 0 {
+					success = true
+				}
+				logrus.Infof("Exit Status: %d", status.ExitStatus())
+				return errors.New(fmt.Sprintf("Exit Status: %d", status.ExitStatus()))
+			}
+		} else {
+			logrus.Errorf("cmd.Wait: %v", err)
+			return err
+		}
+	}
+
+	return nil
 }
 
 func run() (err error) {

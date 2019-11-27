@@ -1,7 +1,7 @@
 package main
 
 const cloneTpl = `#!/bin/sh
-cd {{.Root}}; git clone --branch {{.Branch}} "{{.Url}}" {{.Name}} 2>&1; cd {{.Name}}; git checkout -qf $NTCI_BUILDER_SHA; base64 -d $NTCI_BUILDER_DOCKERFILE > Dockerfile 2>&1 `
+cd {{.Root}}; git clone --branch {{.Branch}} "{{.Url}}" {{.Name}} 2>&1; cd {{.Name}}; git checkout -qf $NTCI_BUILDER_SHA; [[ -z "$NTCI_BUILDER_DOCKERFILE" ]] && echo "Use project dockerfile" || base64 -d $NTCI_BUILDER_DOCKERFILE > Dockerfile 2>&1 `
 
 const buildTpl = `#!/bin/sh
 echo "------->[Commit SHA]"
