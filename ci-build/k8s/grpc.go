@@ -63,7 +63,7 @@ func (s *server) RestartJob(ctx context.Context, in *build_rpc_v1.Request) (*bui
 			Message: err.Error(),
 		}, nil
 	}
-	
+
 	return &build_rpc_v1.Reply{
 		Code:    0,
 		Message: "OK",
@@ -119,16 +119,17 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 	logrus.Debugf("Receive Build Request. User: %s Name: %s Branch: %s Git: %s ID: %d Language: %s Ver: %s. Sha: %s Message: %s ", in.User, in.Name, in.Branch, in.Url, in.Id, in.Language, in.Lanversion, in.Sha, in.Message)
 
 	b := store.Build{
-		Name:      in.Name,
-		Branch:    in.Branch,
-		Git:       in.Url,
-		Timestamp: time.Now().Local(),
-		Token:     bus.Token,
-		Addr:      bus.Addr,
-		User:      in.User,
-		Sha:       in.Sha,
-		Message:   in.Message,
-		Id:        int(in.Id),
+		Name:       in.Name,
+		Branch:     in.Branch,
+		Git:        in.Url,
+		Timestamp:  time.Now().Local(),
+		Token:      bus.Token,
+		Addr:       bus.Addr,
+		User:       in.User,
+		Sha:        in.Sha,
+		Message:    in.Message,
+		Id:         int(in.Id),
+		Dockerfile: in.Dockerfile,
 	}
 
 	isExist, image := fetchImage(in.Language, in.Lanversion)
