@@ -84,17 +84,18 @@ func (s *Service) InvokeBuildService(ntci git.Ntci) (err error) {
 	}
 
 	r, err := builder.InvokeBuilderServiceRun(&build_rpc_v1.Request{
-		Name:       s.name,
-		Id:         int32(s.jid),
-		Branch:     s.branch,
-		Url:        s.webURL,
-		Language:   s.language,
-		Lanversion: s.lanversion,
-		User:       s.user,
-		Sha:        s.sha,
-		Message:    s.message,
-		Env:        env,
-		Dockerfile: s.dockerfile,
+		Name:        s.name,
+		Id:          int32(s.jid),
+		Branch:      s.branch,
+		Url:         s.webURL,
+		Language:    s.language,
+		Lanversion:  s.lanversion,
+		User:        s.user,
+		Sha:         s.sha,
+		Message:     s.message,
+		Env:         env,
+		Dockerfile:  s.dockerfile,
+		BuildScript: s.buidScript,
 	})
 
 	if err != nil {

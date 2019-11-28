@@ -130,6 +130,7 @@ func (s *server) Run(ctx context.Context, in *build_rpc_v1.Request) (*build_rpc_
 		Message:    in.Message,
 		Id:         int(in.Id),
 		Dockerfile: in.Dockerfile,
+		BuildScript: in.BuildScript,
 	}
 
 	isExist, image := fetchImage(in.Language, in.Lanversion)

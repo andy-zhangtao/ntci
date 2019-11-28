@@ -159,6 +159,10 @@ func NewJob(b store.Build, commenv map[string]string) (err error) {
 									Name:  "NTCI_BUILDER_DOCKERFILE",
 									Value: base64.StdEncoding.EncodeToString([]byte(b.Dockerfile)),
 								},
+								{
+									Name:  "NTCI_BUILDER_SCRIPT",
+									Value: base64.StdEncoding.EncodeToString([]byte(b.BuildScript)),
+								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
