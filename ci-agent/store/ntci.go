@@ -33,12 +33,15 @@ func (p *PGBus) GetNtci(user, name, branch string) (ntci string, err error) {
 		return ntci, err
 	}
 
+	defer rows.Close()
+
 	if rows.Next() {
 		err = rows.Scan(&ntci)
 		if err != nil {
 			return ntci, err
 		}
 	}
+
 
 	return
 }

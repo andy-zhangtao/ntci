@@ -58,6 +58,7 @@ type pushEvent struct {
 		GitSSHURL       string `json:"git_ssh_url"`
 		VisibilityLevel int    `json:"visibility_level"`
 	} `json:"repository"`
+	Build string `json:"build"`
 }
 
 const (

@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -37,6 +38,7 @@ type Service struct {
 	sha        string
 	message    string
 	namespace  string
+	buidScript string
 }
 
 func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +88,10 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		s.message = push.Commits[commits-1].Message
 	}
 
-	s.sha = push.CheckoutSha[:12]
+	if push.CheckoutSha != "" {
+		s.sha = push.CheckoutSha[:12]
+	}
+
 	s.namespace = push.Project.PathWithNamespace
 
 	bus := dataBus.GetBus()
@@ -111,6 +116,11 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 
 	s.jid = id
 
+	//buildScript := ""
+	if push.Build != "" {
+		s.buidScript = push.Build
+	}
+
 	n, err := git.ParseAndExecuteBuild(s)
 	logrus.Debugf("ntct.yml: %v", n)
 
@@ -122,6 +132,7 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 	}
 
 	nt, err := yaml.Marshal(n)
+	//buildScript = string(nt)
 
 	err = bus.Pb.AddNtci(s.user, s.name, s.branch, string(nt))
 	if err != nil {
@@ -130,6 +141,9 @@ func (s *Service) GitCallBack(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
+
+	w.Write([]byte(fmt.Sprintf("%s-%d", s.name, s.jid)))
+	return
 }
 
 // converName conver '_' to '-'

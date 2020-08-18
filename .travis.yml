@@ -6,7 +6,7 @@ go:
 env:
   global:
     - GO111MODULE=on
-    - NTCI_VERSION=v0.2.0
+    - NTCI_VERSION=v0.2.1
     - NTCI_IMG_NAME=vikings/ntci
     - NTCI_IMG_K8S=vikings/k8s-build
     - NTCI_IMG_DEPLOY=vikings/ntci-deployer
@@ -29,10 +29,18 @@ after_script:
   - docker push ${NTCI_IMG_NAME}:${NTCI_VERSION}-${TRAVIS_BRANCH}
   - docker build -t ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH} -f Dockerfile.k8s-build .
   - docker push ${NTCI_IMG_K8S}:${NTCI_VERSION}-${TRAVIS_BRANCH}
+  - docker build -t ${NTCI_IMG_NAME}-generic:ubuntu -f script/builder/generic/Dockerfile.ubuntu .
+  - docker push ${NTCI_IMG_NAME}-generic:ubuntu
   - docker build -t ${NTCI_IMG_NAME}-go:latest -f script/builder/golang/Dockerfile.latest .
   - docker push ${NTCI_IMG_NAME}-go:latest
+  - docker build -t ${NTCI_IMG_NAME}-go:pcap -f script/builder/golang/Dockerfile.pcap .
+  - docker push ${NTCI_IMG_NAME}-go:pcap
   - docker build -t ${NTCI_IMG_NAME}-node:yarn -f script/builder/node/Dockerfile.yarn .
   - docker push ${NTCI_IMG_NAME}-node:yarn
+  - docker build -t ${NTCI_IMG_NAME}-java:maven-3-jdk-8 -f script/builder/java/Dockerfile.maven.3.jdk.8 .
+  - docker push ${NTCI_IMG_NAME}-java:maven-3-jdk-8
+  - docker build -t ${NTCI_IMG_NAME}-java:gradle-5-jdk-8 -f script/builder/java/Dockerfile.gradle.5.jdk.8 .
+  - docker push ${NTCI_IMG_NAME}-java:gradle-5-jdk-8
   - docker build -t ${NTCI_IMG_DEPLOY}:systemd-latest -f Dockerfile.deploy-systemd .
   - docker push ${NTCI_IMG_DEPLOY}:systemd-latest
   - docker build -t ${NTCI_IMG_DEPLOY}:k8s-latest -f Dockerfile.deploy-k8s .

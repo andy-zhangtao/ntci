@@ -1,0 +1,4 @@
+FROM vikings/ntci-base:ubuntu
+COPY bin/ntci-builder /ntci-builder
+ENV  NTCI_BUILDER_ROOT=/
+ENTRYPOINT ["/ntci-builder"]

@@ -17,6 +17,11 @@ import (
 )
 
 func (s *Service) FetchNtCI() (n git.Ntci, err error) {
+	if s.buidScript != "" {
+		err = yaml.Unmarshal([]byte(s.buidScript), &n)
+		return n, err
+	}
+
 	queryURL := fmt.Sprintf("%sapi/v4/projects/%d/repository/files/.ntci.yml/raw?ref=%s", s.url, s.id, s.branch)
 	logrus.Debugf("Fetch .ntci.yml request: %s", queryURL)
 
