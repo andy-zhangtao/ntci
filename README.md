@@ -2,6 +2,8 @@
 
 A New Tiny CI Tool
 
+[文档](https://andy-zhangtao.github.io/ntci/)
+
 ## Agents
 
 + ci-agent
