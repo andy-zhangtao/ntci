@@ -15,7 +15,6 @@ require (
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/lib/pq v1.2.0
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -24,10 +23,9 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.2.4
 	k8s.io/api v0.0.0-20181204000039-89a74a8d264d
-	k8s.io/apimachinery v0.0.0-20181127025237-2b1284ed4c93
+	k8s.io/apimachinery v0.15.7
 	k8s.io/client-go v10.0.0+incompatible
 	k8s.io/klog v1.0.0 // indirect
-	sigs.k8s.io/yaml v1.1.0 // indirect
 
 )
 
